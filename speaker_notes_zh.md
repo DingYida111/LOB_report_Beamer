@@ -16,15 +16,15 @@ Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两
 
 这层智能输出的是更简洁的 order actions：什么时候交易、多激进、走内部匹配还是外部路由、如何反馈成本归因。效率收益来自更低滑点、更低冲击成本、更高内部化率，以及可衡量的 PnL attribution。
 
-## 3. FAK Order Execution Alpha
+## 3. FAK Order Execution Efficiency
 
-这一页讲第一条主线：FAK order execution alpha。
+这一页讲第一条主线：FAK order execution efficiency。
 
 流程上，LOB 特征先生成 direction 和 liquidity regime 信号，再和 Algo 当前的实时成交概率结合，包括当前队列位置、剩余量、盘口深度和历史成交行为。这里不要在图上强调 15 到 130 分钟，因为它容易被误解成 raw LOB 对这个 horizon 的直接价格预测。更准确的讲法是：这些信号按执行窗口和流动性状态更新，最终输出不是简单买卖信号，而是 FAK order 的执行决策：什么时候点、点在哪一档、要多激进。
 
 这里要讲清楚两个场景。
 
-第一个场景是市场方向有利。比如我们要买，LOB 信号显示后续市场方向也偏上，成交概率更高，这时 FAK order 更容易产生 execution alpha，体现为更低滑点、更低 market impact。
+第一个场景是市场方向有利。比如我们要买，LOB 信号显示后续市场方向也偏上，成交概率更高，这时 FAK order 更容易产生 execution efficiency，体现为更低滑点、更低 market impact。
 
 第二个场景是市场方向不利。比如我们要买，但 LOB 方向和成交概率都不支持，这时不应该盲目维持原来的 FAK order 预期，而应该修正成交预期和激进程度。这样可以提高交易成功率，同时减少没有及时 hedge 带来的 unhedged risk。
 
@@ -46,24 +46,24 @@ Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两
 
 ## 5. Microstructure for Internal Flow
 
-这一页讲第二条主线：microstructure 如何提升 internal flow 利用效率。
+这一页讲第二条主线：microstructure 如何提升 internal flow 利用效率。这里我把问题改成 internal fit score，而不是单纯画一条 internal flow 流程。
 
-如果只看单笔订单，LOB 信号解决的是执行时点和点单方式。但从部门层面看，我们可以把客户订单、desk orders、RFQ、库存、axes 和历史成交整合成 internal flow map。
+左边三类输入分别是客户和 desk orders、库存/RFQ/axes，以及上一页讲的 liquidity state。它们共同生成 internal fit score：也就是这笔交易在内部被匹配、被风险转移、或者被库存消化的可能性和经济性。
 
-这样做的核心价值是：在外部市场成交之前，先判断内部是否存在可匹配需求。如果能内部截单或内部成交，就可以避免外部 bid/ask spread 和 market impact。对于不能内部匹配的剩余风险，再结合 LOB 深度、resiliency 和方向信号选择更好的外部执行时点和路由。
+如果 internal fit 高，优先 internal crossing，避免外部 spread 和 market impact。如果只是部分匹配，剩余风险再走 external routing，但要等 liquidity state 支持，比如 depth 和 resiliency 较好时执行。
 
-这页要强调，microstructure 不是单独做一个模型，而是提升 internal flow 利用效率的一层执行智能：什么时候内部化，什么时候外部化，外部化时怎么减少成本。
+这页要强调，microstructure 不是单独做一个模型，而是把外部 liquidity cost 和内部 flow fit 同时放进决策：什么时候内部化，什么时候外部化，外部化时怎么减少成本。
 
-计划上可以补一句：先做透明的 liquidity-state baseline，包括 spread、depth、imbalance、queue depletion 和 resiliency；再接入 FAK fill probability 和 internal flow map；先 shadow trading，再小范围 A/B test。评价指标不看模型准确率本身，而看 internalization uplift、residual external cost、slippage 和 post-trade impact。
+评价指标不看模型准确率本身，而看 internalization uplift、residual external cost、slippage 和 post-trade impact。这也是 LOB benchmark 和 LOBFrame 这类研究给我们的重要提醒：预测指标必须转成交易成本指标。
 
-## 6. How We Save 0.01 bp Per Trade
+## 6. 0.01 bp as Attributed Execution PnL
 
-最后一页讲 0.01bp 是怎么省出来的，以及如何证明。
+最后一页讲 0.01bp 如何变成可归因的 execution PnL。
 
 基础目标是每笔交易平均节省 0.01bp。按照 2025 年交易量约 45 万亿、平均久期 2 年计算，固定收益近似是 45 万亿乘以 2，再乘以 0.01bp，约等于 9000 万人民币年度 PnL。
 
 理论上，0.01bp 来自三类机制。
 
-第一是 internal crossing。如果内部能匹配，就可以少付外部 spread 和 market impact。第二是 timing，在订单簿深度好、恢复快、冲击成本低的时候执行。第三是 adverse selection control，在市场方向不利时减少错误的被动成交或无效主动点单。
+第一是 internal crossing。如果内部能匹配，就可以少付外部 spread 和 market impact。第二是 liquidity timing，在订单簿深度好、恢复快、冲击成本低的时候执行。第三是 adverse selection control，在市场方向不利时减少错误成交、hedge leakage 和 bad fills。
 
-实际计划上，我们不空口说节省，而是用三类指标验证：相对 arrival price 或 decision price 的 slippage；成交后的 market impact；以及 internalization uplift 和 residual external cost。只要这三类指标能稳定改善，就能把 0.01bp 的节省做成可归因、可汇报的结果。
+实际计划上，我们不空口说节省，而是用三类指标验证：相对 arrival price 或 decision price 的 slippage；成交后的 market impact 和 hedge delay；以及 internalization uplift 对比 residual external cost。只要这些指标能稳定改善，就能把 0.01bp 的节省做成可归因、可汇报的结果。

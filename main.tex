@@ -64,9 +64,9 @@
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
   \fill[BrandOrange] (current page.south west) rectangle (current page.north east);
-  \node[align=center,text=white,font=\bfseries\fontsize{24}{29}\selectfont,text width=12.5cm] at ([yshift=0.85cm]current page.center) {Applications of LOB and Microstructure};
-  \node[align=center,text=white,font=\large] at ([yshift=-0.75cm]current page.center) {Algo Type1 Execution Alpha and Internal Flow Efficiency};
-  \node[align=center,text=white,font=\normalsize] at ([yshift=-1.55cm]current page.center) {Quant team \quad | \quad June 2026};
+  \node[align=center,text=white,font=\bfseries\fontsize{23}{28}\selectfont,text width=12.7cm] at ([yshift=0.85cm]current page.center) {Liquidity-Aware Smart Execution\\for Desk Efficiency};
+  \node[align=center,text=white,font=\large] at ([yshift=-0.75cm]current page.center) {Microstructure Signals Across Manual Trading and Peak Algo};
+  \node[align=center,text=white,font=\normalsize] at ([yshift=-1.55cm]current page.center) {Yida Ding \quad | \quad June 2026};
 \end{tikzpicture}
 \end{frame}
 
@@ -100,7 +100,7 @@
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{FAK Order Execution Alpha}
+\contentheader{FAK Order Execution Efficiency}
 \begin{columns}[T,totalwidth=\textwidth]
 \begin{column}{0.54\textwidth}
 \begin{tikzpicture}[node distance=0.36cm,every node/.style={font=\scriptsize}]
@@ -109,7 +109,7 @@
   \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of sig] (prob) {Real-time fill probability\\Algo state and queue position};
   \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of prob] (act) {FAK order decision\\timing, level, aggressiveness};
   \foreach \i/\j in {lob/sig,sig/prob,prob/act}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=2.70cm,align=center,inner sep=4pt,right=0.18cm of prob] (out) {Execution alpha\\Fill quality\\Risk control};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=2.70cm,align=center,inner sep=4pt,right=0.18cm of prob] (out) {Execution efficiency\\Fill quality\\Cost control};
   \draw[-{Stealth[length=2mm]},BrandGray,thick] (act.east) -- ++(0.18,0) |- (out.south);
 \end{tikzpicture}
 \end{column}
@@ -118,7 +118,7 @@
 \begin{itemize}\tightitems
   \item Direction supports the order side.
   \item Expected fill probability is higher.
-  \item Execution alpha: lower slippage and lower market impact.
+  \item Execution efficiency: lower slippage and lower market impact.
 \end{itemize}
 \end{block}
 \begin{block}{Case 2: adverse direction}
@@ -180,23 +180,30 @@
 \contentheader{Microstructure for Internal Flow}
 \begin{columns}[T,totalwidth=\textwidth]
 \begin{column}{0.56\textwidth}
-\begin{tikzpicture}[node distance=0.36cm,every node/.style={font=\scriptsize}]
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt] (client) {Client / desk orders};
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt,below=of client] (flow) {Internal flow map\\inventory, RFQ, inquiry, axes};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt,below=of flow] (match) {Internal crossing\\and smart routing};
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt,below=of match] (ext) {External execution\\only residual risk};
-  \foreach \i/\j in {client/flow,flow/match,match/ext}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.15cm,align=center,inner sep=4pt,right=0.36cm of match] (benefit) {Higher utilization\\Lower external cost\\Better risk transfer};
-  \draw[-{Stealth[length=2mm]},BrandGray,thick] (match.east) -- (benefit.west);
+\begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=2.75cm,align=center,inner sep=4pt] (orders) at (1.55,3.35) {Orders + flow\\inventory, RFQ, axes};
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=2.75cm,align=center,inner sep=4pt] (liq) at (1.55,1.55) {Liquidity state\\cost, capacity};
+
+  \node[draw=BrandOrange,fill=white,rounded corners=2pt,line width=1pt,text width=2.30cm,align=center,inner sep=5pt,font=\scriptsize\bfseries] (fit) at (4.25,2.45) {Internal fit score};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=2.15cm,align=center,inner sep=4pt] (cross) at (6.40,3.35) {Internal\\crossing};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=2.15cm,align=center,inner sep=4pt] (route) at (6.40,1.55) {Residual\\routing};
+  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.30cm,align=center,inner sep=4pt] (metric) at (6.40,0.35) {Uplift vs.\\residual cost};
+
+  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (orders.east) -- (fit.160);
+  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (liq.east) -- (fit.200);
+  \draw[-{Stealth[length=2mm]},BrandGreen,thick] (fit.25) -- (cross.west);
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (fit.-25) -- (route.west);
+  \draw[-{Stealth[length=2mm]},BrandBlue,thick] (cross.south) -- (metric.north);
+  \draw[-{Stealth[length=2mm]},BrandBlue,thick] (route.south) -- (metric.north);
 \end{tikzpicture}
 \end{column}
 \begin{column}{0.40\textwidth}
-\begin{block}{Evidence-backed plan}
+\begin{block}{Research-backed decision}
 \begin{itemize}\tightitems
-  \item Segment flow by liquidity regime before routing.
-  \item Prioritize internal crossing before paying spread and impact.
-  \item Use queue and order-flow signals for residual external execution.
-  \item Validate by internalization uplift and residual external cost.
+  \item Price external liquidity by state, not quote alone.
+  \item Estimate internal fit from inventory, RFQ and axes.
+  \item Route residual flow when depth and resiliency are favorable.
+  \item Prove uplift against residual external cost.
 \end{itemize}
 \end{block}
 \end{column}
@@ -204,14 +211,14 @@
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{How We Save 0.01 bp Per Trade}
+\contentheader{0.01 bp as Attributed Execution P\&L}
 \begin{columns}[T,totalwidth=\textwidth]
 \begin{column}{0.45\textwidth}
 \begin{block}{Base-case value}
 \begin{center}
 {\fontsize{24}{28}\selectfont\bfseries\color{BrandOrangeDark}90M}\\
 \vspace{0.1em}
-{\small annual P\&L target from 0.01 bp saving}
+{\small annual target from 0.01 bp saving}
 \end{center}
 \end{block}
 \begin{itemize}\tightitems
@@ -221,18 +228,18 @@
 \end{itemize}
 \end{column}
 \begin{column}{0.51\textwidth}
-\begin{block}{Where the saving comes from}
+\begin{block}{Attribution stack}
 \begin{itemize}\tightitems
   \item \key{Internal crossing:} avoid spread and external market impact.
-  \item \key{Timing:} trade when depth and resiliency are favorable.
-  \item \key{Adverse-selection control:} avoid passive fills when direction is unfavorable.
+  \item \key{Liquidity timing:} trade when depth and resiliency are favorable.
+  \item \key{Adverse-selection control:} reduce hedge leakage and bad fills.
 \end{itemize}
 \end{block}
-\begin{block}{How we prove it}
+\begin{block}{Proof metrics}
 \begin{itemize}\tightitems
   \item Slippage vs. arrival / decision price.
-  \item Market impact after execution.
-  \item Internalization uplift and residual external cost.
+  \item Post-trade impact and hedge delay.
+  \item Internalization uplift vs. residual external cost.
 \end{itemize}
 \end{block}
 \end{column}

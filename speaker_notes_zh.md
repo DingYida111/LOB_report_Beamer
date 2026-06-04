@@ -1,77 +1,61 @@
-# LOB 15 分钟领导汇报讲稿
+# LOB 5 页领导汇报讲稿
 
-## 1. Title
+## 1. Plan, Feasibility, and Key Risks
 
-今天汇报的重点不是做一场文献综述，而是讲 Limit Order Book 研究在我们业务里可以交付什么。
+这一页直接回答领导最关心的两个问题：我们计划做什么，以及这件事是否可行。
 
-我会把技术背景压得很短，重点讲两个产出方向：第一，直接服务当前 Algo 实例里 Type1 主动点单的执行；第二，扩展成部门级 internal flow 优化能力。
+计划分两条线。第一条是把 LOB 信号接入当前 Algo Type1 主动点单，目标是提升成交质量、降低滑点和 market impact。第二条是把同样的 microstructure 信号扩展到部门级 internal flow，提高内部截单、内部成交和智能路由的利用效率。
 
-## 2. One-Page Context
+目前可行性上，研究路径已经明确，价值目标也已经按 0.01bp 成本节省校准为每年约 9000 万人民币。第一版不需要直接上复杂深度模型，可以从 spread、depth、imbalance、queue depletion、resiliency 这些可解释特征开始。
 
-这一页只用来交代背景。
+风险主要有四个：第一是数据对齐，订单簿、订单、成交和 internal flow 的时间戳必须能对上；第二是标签不能有未来信息泄露；第三是 PnL 归因要干净，能区分方向、spread、impact 和 routing 的贡献；第四是信号要能跨市场状态稳定，不能只在某一段行情里有效。
 
-订单簿的价值在于，它是交易执行前最接近真实市场状态的数据。它不只是告诉我们价格可能往哪里走，还能同时观察队列深度、成交概率、流动性恢复速度和冲击成本。
+## 2. Algo Type1 Execution Alpha
 
-所以这项研究不应该只被理解成“做一个预测价格涨跌的模型”。对我们更有价值的方向，是把订单簿信号变成执行决策：什么时候主动点单、点在哪一档、市场方向是否配合、预期成交概率是否足够高。
+这一页讲第一条主线：Algo Type1 execution alpha。
 
-右边的图只是帮助领导理解：bid/ask queue 不是研究目的，真正要提炼的是 direction、fill probability 和 impact risk 这三个执行变量。
+流程上，LOB 特征先生成 15 到 130 分钟的市场方向信号，再和 Algo 当前的实时成交概率结合，包括当前队列位置、剩余量、盘口深度和历史成交行为。最终输出不是简单买卖信号，而是 Type1 主动点单的执行决策：什么时候点、点在哪一档、要多激进。
 
-后面的汇报就围绕两个可落地交付展开。
+这里要讲清楚两个场景。
 
-## 3. Output 1: Algo Type1 Execution Alpha
+第一个场景是市场方向有利。比如我们要买，LOB 信号显示后续市场方向也偏上，成交概率更高，这时主动点单更容易产生 execution alpha，体现为更低滑点、更低 market impact。
 
-第一个产出是直接接入当前 Algo 实例，服务 Type1 主动点单。
+第二个场景是市场方向不利。比如我们要买，但 LOB 方向和成交概率都不支持，这时不应该盲目维持原来的 Type1 预期，而应该修正成交预期和激进程度。这样可以提高交易成功率，同时减少没有及时 hedge 带来的 unhedged risk。
 
-我们的目标是在 15 分钟到 130 分钟的频率级别提供市场方向信号。这个信号不是单独用来下交易指令，而是和 Algo 当前的成交概率分析结合。
+## 3. Algo Plan and Literature Support
 
-具体来说，订单簿特征先生成方向信号，比如未来 15、30、60、90、130 分钟市场压力偏买还是偏卖；然后结合 Algo 自己的实时状态，例如当前队列位置、剩余量、盘口深度和历史成交概率，判断是否适合主动点单。
+这一页继续讲 Algo Type1，但重点放在计划和理论佐证。
 
-如果方向和成交概率都支持，就可以提高 Type1 主动点单的成功率；如果市场方向不利，或者订单簿状态显示冲击成本较高，就减少追价和无效点单。最终目标是提高成交概率，同时减少 slippage 和 market impact。
+实施计划上，第一步是按 15、30、60、90、130 分钟不同 horizon 建 LOB 特征流和方向标签。第二步先做透明特征，包括 spread、depth、imbalance、queue depletion 和 resiliency。第三步把方向信号接入 Algo 成交概率引擎。第四步先 shadow trading，再做小范围 A/B test。
 
-## 4. Output 1: Delivery Plan and KPIs
+文献上可以用三类研究来支撑。
 
-这一页讲第一条产线怎么落地。
+第一，Cont 和 de Larrard 这一类 queueing model 说明，best bid 和 best ask 队列被消耗时，短期价格移动有明确的微观结构机制。
 
-第一步是做订单簿特征流和方向标签，先不要上复杂模型，先做可解释的 baseline。第二步按不同 horizon 训练信号，包括 15、30、60、90、130 分钟。第三步把信号接到 Algo 的成交概率引擎里，形成执行侧的联合判断。第四步先 shadow trading，再做小范围 A/B test。
+第二，Bacry 等人的 Hawkes/order-flow 研究说明，订单流有自激发和聚集特征，所以短期强弱方向和成交强度本身是可以建模的，但要注意 regime dependence。
 
-评估指标不看单纯预测准确率，而看业务指标：Type1 的 fill rate 是否提升，slippage 是否下降，成交后的 adverse move 是否减少，以及模型在不同 horizon 和市场状态下是否稳定。
+第三，DeepLOB 和后续 benchmark 说明，订单簿快照和短期序列确实包含预测结构；但 benchmark 也提醒我们，不能只看分类准确率，必须看扣除交易成本后的执行指标。
 
-这一页给领导传递的信息是：这不是研究论文，而是可以按工程里程碑推进的执行增强模块。
+所以我们的策略是先做可解释、成本感知的 baseline，再决定是否上 DeepLOB 或 Transformer。
 
-## 5. Output 2: Department Internal Flow Engine
+## 4. Microstructure for Internal Flow
 
-第二个产出是部门级 internal flow 优化。
+第四页讲第二条主线：microstructure 如何提升 internal flow 利用效率。
 
-如果只看单笔订单，LOB 信号解决的是执行时点和点单方式；但如果站在部门层面，我们还可以把历史订单、询价、库存、axes 和实际成交数据整合起来，形成内部流动性地图。
+如果只看单笔订单，LOB 信号解决的是执行时点和点单方式。但从部门层面看，我们可以把客户订单、desk orders、RFQ、库存、axes 和历史成交整合成 internal flow map。
 
-这样做的核心价值是：在外部市场交易之前，先识别内部是否有可匹配需求，或者是否存在更优的路由和时点。能够内部截单或内部成交的部分，就可以减少外部交易成本；不能内部匹配的剩余风险，再通过外部市场执行。
+这样做的核心价值是：在外部市场成交之前，先判断内部是否存在可匹配需求。如果能内部截单或内部成交，就可以避免外部 bid/ask spread 和 market impact。对于不能内部匹配的剩余风险，再结合 LOB 深度、resiliency 和方向信号选择更好的外部执行时点和路由。
 
-所以 internal flow engine 的目标是提高内部化率、优化风险转移，并降低整体交易成本。
+这页要强调，microstructure 不是单独做一个模型，而是提升 internal flow 利用效率的一层执行智能：什么时候内部化，什么时候外部化，外部化时怎么减少成本。
 
-## 6. Value Case: Leadership Focus
+## 5. How We Save 0.01 bp Per Trade
 
-这一页 PPT 上不要写太多计算细节，只保留领导关心的结论和试点要证明的事情。
+最后一页讲 0.01bp 是怎么省出来的，以及如何证明。
 
-按固定收益近似，节省收益率成本带来的价格收益可以写成：名义本金乘以久期，再乘以节省的 bp。假设 2025 年交易量是 45 万亿人民币，平均久期 2 年。
+基础目标是每笔交易平均节省 0.01bp。按照 2025 年交易量约 45 万亿、平均久期 2 年计算，固定收益近似是 45 万亿乘以 2，再乘以 0.01bp，约等于 9000 万人民币年度 PnL。
 
-如果每笔交易平均节省 0.01bp，计算结果是 45 万亿乘以 2，再乘以 0.01bp，也就是大约 9000 万人民币。
+理论上，0.01bp 来自三类机制。
 
-所以这版建议就按 0.01bp 来讲，把基础目标定为每年约 9000 万人民币。PPT 上只写 RMB 90mm annual PnL target，不展开所有假设。
+第一是 internal crossing。如果内部能匹配，就可以少付外部 spread 和 market impact。第二是 timing，在订单簿深度好、恢复快、冲击成本低的时候执行。第三是 adverse selection control，在市场方向不利时减少错误的被动成交或无效主动点单。
 
-领导更需要关注的是三点：第一，节省能不能被干净归因；第二，Algo 执行和 internal flow 能不能共用一套成本归因框架；第三，这个试点能不能从少数标的扩展到部门级 flow。
-
-后续如果覆盖流量扩大、节省幅度提高，或者实际久期更长，可以作为 upside 单独讨论，不需要放在这页主线里。
-
-## 7. Roadmap and Leadership Ask
-
-最后总结成两条产线。
-
-第一条是 Algo Type1：做 15 到 130 分钟市场方向信号，并接入实时成交概率分析，用于提高主动点单成功率、减少滑点和冲击成本。
-
-第二条是 internal flow：做内部截单、内部成交、智能路由和流动性选择，把单点执行优化扩展成部门级交易成本优化产品。
-
-近期里程碑可以这样讲：两周内完成数据检查、baseline 特征和信号看板；四到六周做 shadow trading 和 internal-flow simulator；八到十二周争取小范围生产试点。
-
-需要领导确认三件事：优先标的和 Algo 实例、LOB 和内部 flow 数据权限、以及 PnL 归因口径，包括 slippage、market impact 和 internal crossing saving。
-
-最后一句话：先交付执行 alpha，再把它扩展成部门级 flow 产品。
+实际计划上，我们不空口说节省，而是用三类指标验证：相对 arrival price 或 decision price 的 slippage；成交后的 market impact；以及 internalization uplift 和 residual external cost。只要这三类指标能稳定改善，就能把 0.01bp 的节省做成可归因、可汇报的结果。

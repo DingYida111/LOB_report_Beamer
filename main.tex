@@ -6,7 +6,6 @@
 
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
-\usepackage{graphicx}
 \usepackage{tabularx}
 \usepackage{tikz}
 \usepackage{iftex}
@@ -21,8 +20,6 @@
   \IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{TeX Gyre Termes}}
 \fi
 \renewcommand{\familydefault}{\sfdefault}
-
-\graphicspath{{figs/}}
 
 \definecolor{BrandOrange}{RGB}{243,93,0}
 \definecolor{BrandOrangeDark}{RGB}{184,67,0}
@@ -42,27 +39,22 @@
 \setbeamercolor{block title}{fg=white,bg=BrandOrange}
 \setbeamercolor{block body}{fg=BrandInk,bg=BrandOrangeLight}
 \setbeamertemplate{itemize item}{\color{BrandOrange}$\blacktriangleright$}
-\setbeamertemplate{itemize subitem}{\color{BrandOrange}$\bullet$}
 
-\setlength{\parskip}{0.12em}
+\setlength{\parskip}{0.10em}
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.10}
 
 \newcommand{\tightitems}{\setlength{\itemsep}{0.20em}}
-\newcommand{\source}[1]{{\vspace{0.05em}\tiny\color{BrandGray}Source: #1\par}}
 \newcommand{\key}[1]{\textcolor{BrandOrangeDark}{\textbf{#1}}}
-\newcommand{\muted}[1]{\textcolor{BrandGray}{#1}}
 \newcommand{\contentheader}[1]{%
-  \vspace*{0.02em}%
+  \vspace*{0.06cm}%
   {\noindent\color{BrandOrange}\rule{0.42em}{0.42em}\hspace{0.50em}\bfseries\Large #1\par}%
   \vspace{0.10em}{\color{BrandOrange}\rule{\textwidth}{1.25pt}\par}\vspace{0.25em}%
 }
-\newcommand{\metricbox}[3]{%
-  \node[draw=#2,fill=#3,rounded corners=2pt,align=center,inner sep=5pt,text width=2.85cm,font=\scriptsize] {#1};%
-}
+\newcommand{\source}[1]{{\vspace{0.10em}\tiny\color{BrandGray}Source: #1\par}}
 
 \title{Limit Order Book Execution Plan}
-\subtitle{Algo Type1 Signals and Internal Flow Optimization}
+\subtitle{Algo Type1 Execution Alpha and Internal Flow Efficiency}
 \author{Yida Ding}
 \date{June 2026}
 
@@ -70,203 +62,156 @@
 \small
 
 \begin{frame}[plain]
-\begin{tikzpicture}[remember picture,overlay]
-  \fill[BrandOrange] (current page.south west) rectangle (current page.north east);
-  \node[align=center,text=white,font=\bfseries\fontsize{23}{27}\selectfont] at ([yshift=0.82cm]current page.center) {Limit Order Book Execution Plan};
-  \node[align=center,text=white,font=\Large] at ([yshift=0.02cm]current page.center) {Algo Type1 Signals and Internal Flow Optimization};
-  \node[align=center,text=white,font=\normalsize] at ([yshift=-1.20cm]current page.center) {15-minute leadership briefing \quad | \quad \today};
-\end{tikzpicture}
-\end{frame}
-
-\begin{frame}[plain]
-\contentheader{One-Page Context}
+\contentheader{Plan, Feasibility, and Key Risks}
 \begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.50\textwidth}
-\begin{block}{Why LOB matters}
-The order book is the closest observable state before execution: price direction, queue depth, fill probability, and impact risk are visible together.
-\end{block}
+\begin{column}{0.48\textwidth}
+\begin{block}{Plan}
 \begin{itemize}\tightitems
-  \item Keep the technical introduction to one page.
-  \item Use LOB features to improve execution, not only to predict price.
-  \item Focus on two deliverables: \key{Algo Type1} and \key{department-level internal flow}.
+  \item \key{Algo Type1:} LOB-powered execution layer.
+  \item \key{Internal flow:} crossing, routing, and liquidity timing.
+  \item Value metrics: slippage, impact, fill quality, internalization.
 \end{itemize}
+\end{block}
+\begin{block}{Feasibility status}
+\begin{itemize}\tightitems
+  \item Research path and RMB 90mm base target are defined.
+  \item Prototype can start with interpretable LOB features.
+  \item Required data: book, order/fill, and internal flow timestamps.
+\end{itemize}
+\end{block}
 \end{column}
-\begin{column}{0.46\textwidth}
-\begin{tikzpicture}[x=0.69cm,y=0.32cm]
-  \node[font=\scriptsize,BrandGreen,align=center] at (2.15,5.95) {Bid-side\\depth};
-  \node[font=\scriptsize,BrandOrangeDark,align=center] at (6.65,5.95) {Ask-side\\depth};
-  \draw[BrandGray] (0.45,0) -- (8.35,0);
-  \draw[BrandGray,densely dashed] (4.40,-0.15) -- (4.40,5.55);
-  \node[below,font=\scriptsize,BrandGray] at (4.40,-0.18) {mid price};
-  \foreach \x/\h in {0.8/1.7,1.5/2.3,2.2/3.0,2.9/3.6,3.6/4.3} {\fill[BrandGreen!75] (\x,0) rectangle +(0.46,\h);}
-  \foreach \x/\h in {4.8/1.6,5.5/1.8,6.2/2.3,6.9/2.9,7.6/3.4} {\fill[BrandOrange!78] (\x,0) rectangle +(0.46,\h);}
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.15cm,inner sep=3pt] at (1.35,-2.05) {direction};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.35cm,inner sep=3pt] at (4.35,-2.05) {fill probability};
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.15cm,inner sep=3pt] at (7.30,-2.05) {impact risk};
-\end{tikzpicture}
+\begin{column}{0.48\textwidth}
+\begin{block}{Key risks to manage}
+\begin{itemize}\tightitems
+  \item Data alignment across book, order, fill, and flow.
+  \item Leakage control in labels and backtests.
+  \item Cost attribution across direction, spread, impact, and routing.
+  \item Regime stability in volatile or low-liquidity periods.
+\end{itemize}
+\end{block}
 \end{column}
 \end{columns}
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Output 1: Algo Type1 Execution Alpha}
+\contentheader{Algo Type1 Execution Alpha}
 \begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.57\textwidth}
-\begin{tikzpicture}[node distance=0.38cm,every node/.style={font=\scriptsize}]
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=4.0cm,align=center,inner sep=4pt] (lob) {LOB features\\spread, depth, imbalance, resiliency};
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=4.0cm,align=center,inner sep=4pt,below=of lob] (sig) {15--130 min market-direction signal};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=4.0cm,align=center,inner sep=4pt,below=of sig] (prob) {Real-time fill probability\\from Algo state and queue position};
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=4.0cm,align=center,inner sep=4pt,below=of prob] (act) {Type1 active order decision\\timing, level, aggressiveness};
+\begin{column}{0.54\textwidth}
+\begin{tikzpicture}[node distance=0.36cm,every node/.style={font=\scriptsize}]
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt] (lob) {LOB features\\spread, depth, imbalance, resiliency};
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of lob] (sig) {15--130 min market-direction signal};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of sig] (prob) {Real-time fill probability\\Algo state and queue position};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of prob] (act) {Type1 active order decision\\timing, level, aggressiveness};
   \foreach \i/\j in {lob/sig,sig/prob,prob/act}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt,right=0.28cm of prob] (out) {Higher fill rate\\Lower slippage\\Lower market impact};
-  \draw[-{Stealth[length=2mm]},BrandGray,thick] (act.east) -- ++(0.25,0) |- (out.south);
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=2.70cm,align=center,inner sep=4pt,right=0.18cm of prob] (out) {Execution alpha\\Fill quality\\Risk control};
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (act.east) -- ++(0.18,0) |- (out.south);
 \end{tikzpicture}
 \end{column}
-\begin{column}{0.39\textwidth}
-\begin{block}{Business use}
-Support the current Algo instance for \key{Type1 active order placement}.
-\end{block}
+\begin{column}{0.42\textwidth}
+\begin{block}{Case 1: favorable direction}
 \begin{itemize}\tightitems
-  \item Signal horizon: 15, 30, 60, 90, 130 minutes.
-  \item Combine market direction with execution probability.
-  \item Improve fill probability when direction is favorable.
-  \item Avoid chasing in adverse LOB regimes.
+  \item Direction supports the order side.
+  \item Expected fill probability is higher.
+  \item Execution alpha: lower slippage and lower market impact.
 \end{itemize}
+\end{block}
+\begin{block}{Case 2: adverse direction}
+\begin{itemize}\tightitems
+  \item Direction works against the Type1 order.
+  \item Revise fill expectation and aggressiveness.
+  \item Improve success rate and reduce unhedged risk.
+\end{itemize}
+\end{block}
 \end{column}
 \end{columns}
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Output 1: Delivery Plan and KPIs}
+\contentheader{Algo Plan and Literature Support}
 \begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.50\textwidth}
-\begin{block}{Prototype path}
+\begin{column}{0.48\textwidth}
+\begin{block}{Implementation plan}
 \begin{enumerate}
-  \item Build LOB feature stream and direction labels.
-  \item Train interpretable baseline signals by horizon.
-  \item Join signal with Algo fill-probability engine.
-  \item Run shadow trading, then controlled live A/B test.
+  \item Build LOB feature stream by horizon: 15, 30, 60, 90, 130 minutes.
+  \item Start with transparent features: spread, depth, imbalance, queue depletion, resiliency.
+  \item Join direction signal with Algo fill-probability engine.
+  \item Run shadow trading, then controlled A/B test.
 \end{enumerate}
 \end{block}
 \end{column}
-\begin{column}{0.46\textwidth}
-{\scriptsize
-\begin{tabular}{@{}p{2.2cm}p{4.0cm}@{}}
-\toprule
-KPI & Measurement \\
-\midrule
-Fill rate uplift & Type1 fills vs. baseline by regime \\
-Slippage saving & bps vs. arrival / decision price \\
-Impact control & post-trade adverse move \\
-Model stability & hit rate and IC across horizons \\
-\bottomrule
-\end{tabular}
-}
-\vspace{0.45em}
-\begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
-  \draw[BrandGray,thick] (0,0) -- (5.3,0);
-  \foreach \x/\txt in {0/{Data},1.75/{Shadow},3.5/{A/B},5.3/{Scale}} {
-    \fill[BrandOrange] (\x,0) circle (2pt);
-    \node[below=0.13cm,align=center] at (\x,0) {\txt};
-  }
-\end{tikzpicture}
+\begin{column}{0.48\textwidth}
+\begin{block}{Why feasible}
+\begin{itemize}\tightitems
+  \item Queue models link best-queue depletion to short-term price moves.
+  \item Hawkes-style order-flow models support regime-dependent intensity signals.
+  \item DeepLOB-style evidence shows book snapshots contain short-horizon structure.
+  \item Microstructure benchmarks warn us to evaluate by cost-aware execution metrics, not accuracy alone.
+\end{itemize}
+\end{block}
 \end{column}
 \end{columns}
+\source{Cont and de Larrard; Bacry et al.; Zhang et al. DeepLOB; recent LOB benchmark studies.}
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Output 2: Department Internal Flow Engine}
+\contentheader{Microstructure for Internal Flow}
 \begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.58\textwidth}
-\begin{tikzpicture}[node distance=0.40cm,every node/.style={font=\scriptsize}]
+\begin{column}{0.56\textwidth}
+\begin{tikzpicture}[node distance=0.36cm,every node/.style={font=\scriptsize}]
   \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt] (client) {Client / desk orders};
   \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt,below=of client] (flow) {Internal flow map\\inventory, RFQ, inquiry, axes};
   \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt,below=of flow] (match) {Internal crossing\\and smart routing};
   \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt,below=of match] (ext) {External execution\\only residual risk};
   \foreach \i/\j in {client/flow,flow/match,match/ext}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=4pt,right=0.42cm of match] (benefit) {Lower cost\\Higher internalization\\Better risk transfer};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.15cm,align=center,inner sep=4pt,right=0.36cm of match] (benefit) {Higher utilization\\Lower external cost\\Better risk transfer};
   \draw[-{Stealth[length=2mm]},BrandGray,thick] (match.east) -- (benefit.west);
 \end{tikzpicture}
 \end{column}
-\begin{column}{0.38\textwidth}
-\begin{block}{Department-level target}
-Develop an internal flow optimization layer that reduces transaction cost through internal crossing, better routing, and pre-trade liquidity selection.
-\end{block}
+\begin{column}{0.40\textwidth}
+\begin{block}{How microstructure helps}
 \begin{itemize}\tightitems
-  \item Convert historical flow into actionable liquidity intelligence.
-  \item Match compatible internal demand before external trading.
-  \item Use LOB and flow signals to choose execution timing.
+  \item Identify when external liquidity is expensive.
+  \item Prioritize internal crossing before paying spread and impact.
+  \item Route residual flow when book depth and resiliency are favorable.
+  \item Feed realized cost back into desk-level flow intelligence.
 \end{itemize}
+\end{block}
 \end{column}
 \end{columns}
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Value Case: Leadership Focus}
+\contentheader{How We Save 0.01 bp Per Trade}
 \begin{columns}[T,totalwidth=\textwidth]
 \begin{column}{0.45\textwidth}
-\begin{block}{Base-case opportunity}
+\begin{block}{Base-case value}
 \begin{center}
-{\fontsize{25}{29}\selectfont\bfseries\color{BrandOrangeDark}RMB 90mm}\\
+{\fontsize{24}{28}\selectfont\bfseries\color{BrandOrangeDark}RMB 90mm}\\
 \vspace{0.1em}
-{\small annual P\&L target}
+{\small annual P\&L target from 0.01 bp saving}
 \end{center}
 \end{block}
 \begin{itemize}\tightitems
-  \item Conservative assumption: \key{0.01 bp} average cost saving.
-  \item Source of saving: internal crossing, smarter routing, and lower impact.
-  \item Calculation detail stays in the speaking notes.
+  \item 2025 flow: RMB 45tn.
+  \item Average duration: 2 years.
+  \item \(45tn \times 2 \times 0.01bp \approx RMB 90mm\).
 \end{itemize}
 \end{column}
 \begin{column}{0.51\textwidth}
-\begin{block}{What leadership should focus on}
+\begin{block}{Where the saving comes from}
 \begin{itemize}\tightitems
-  \item Can we measure execution saving cleanly?
-  \item Can Algo and internal flow share the same cost attribution framework?
-  \item Can the pilot scale from a few instruments to department-level flow?
+  \item \key{Internal crossing:} avoid spread and external market impact.
+  \item \key{Timing:} trade when depth and resiliency are favorable.
+  \item \key{Adverse-selection control:} avoid passive fills when direction is unfavorable.
 \end{itemize}
 \end{block}
-\begin{block}{Pilot proof}
+\begin{block}{How we prove it}
 \begin{itemize}\tightitems
-  \item Slippage and market-impact reduction.
-  \item Internalization / crossing uplift.
-  \item Stable savings across market regimes.
+  \item Slippage vs. arrival / decision price.
+  \item Market impact after execution.
+  \item Internalization uplift and residual external cost.
 \end{itemize}
 \end{block}
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}[plain]
-\contentheader{Roadmap and Leadership Ask}
-\begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.50\textwidth}
-\begin{block}{Two workstreams}
-\begin{itemize}\tightitems
-  \item \key{Algo Type1:} 15--130 min direction signal plus fill-probability integration.
-  \item \key{Internal flow:} internal crossing, routing, and liquidity selection engine.
-\end{itemize}
-\end{block}
-\begin{block}{Near-term milestones}
-\begin{itemize}\tightitems
-  \item 2 weeks: data audit, baseline features, signal dashboard.
-  \item 4--6 weeks: shadow trading and internal-flow simulator.
-  \item 8--12 weeks: controlled production pilot.
-\end{itemize}
-\end{block}
-\end{column}
-\begin{column}{0.46\textwidth}
-\begin{block}{Decision needed}
-\begin{itemize}\tightitems
-  \item Confirm priority instruments and Algo instance.
-  \item Approve access to LOB, order, fill, and internal flow data.
-  \item Align on P\&L attribution: slippage, market impact, and internal crossing savings.
-\end{itemize}
-\end{block}
-\vspace{0.35em}
-\begin{center}
-{\large\bfseries\color{BrandOrangeDark}Deliver execution alpha first, then scale it into a department-level flow product.}
-\end{center}
 \end{column}
 \end{columns}
 \end{frame}

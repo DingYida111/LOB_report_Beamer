@@ -1,14 +1,345 @@
-\documentclass{article}
-\usepackage{graphicx} % Required for inserting images
+% !TeX program = xelatex
+\documentclass[aspectratio=169,10pt]{beamer}
 
-\title{LOB_report_Beamer}
-\author{yding54 }
+\usetheme{default}
+\usefonttheme[onlymath]{serif}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{iftex}
+\usetikzlibrary{positioning,arrows.meta,calc}
+
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{CJKutf8}
+  \AtBeginDocument{\begin{CJK*}{UTF8}{gbsn}}
+  \AtEndDocument{\end{CJK*}}
+\else
+  \usepackage{fontspec}
+  \usepackage{xeCJK}
+  \IfFontExistsTF{Arial}{\setsansfont{Arial}}{\setsansfont{TeX Gyre Heros}}
+  \IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{TeX Gyre Termes}}
+  \IfFontExistsTF{Heiti SC}{\setCJKsansfont{Heiti SC}}{\setCJKsansfont{STHeiti}}
+  \IfFontExistsTF{STSong}{\setCJKmainfont{STSong}}{\setCJKmainfont{Songti SC}}
+\fi
+\renewcommand{\familydefault}{\sfdefault}
+
+\graphicspath{{figs/}}
+
+\definecolor{BrandOrange}{RGB}{243,93,0}
+\definecolor{BrandOrangeDark}{RGB}{184,67,0}
+\definecolor{BrandOrangeLight}{RGB}{255,239,232}
+\definecolor{BrandInk}{RGB}{34,34,34}
+\definecolor{BrandGray}{RGB}{91,91,91}
+\definecolor{BrandBlue}{RGB}{28,76,132}
+\definecolor{BrandGreen}{RGB}{34,124,86}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{normal text}{fg=BrandInk,bg=white}
+\setbeamercolor{structure}{fg=BrandOrange}
+\setbeamercolor{block title}{fg=white,bg=BrandOrange}
+\setbeamercolor{block body}{fg=BrandInk,bg=BrandOrangeLight}
+\setbeamertemplate{itemize item}{\color{BrandOrange}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{BrandOrange}$\bullet$}
+
+\setlength{\parskip}{0.18em}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.14}
+
+\newcommand{\tightitems}{\setlength{\itemsep}{0.30em}}
+\newcommand{\source}[1]{{\vspace{0.05em}\tiny\color{BrandGray}Source: #1\par}}
+\newcommand{\key}[1]{\textcolor{BrandOrangeDark}{\textbf{#1}}}
+\newcommand{\muted}[1]{\textcolor{BrandGray}{#1}}
+\newcommand{\contentheader}[1]{%
+  \vspace*{0.02em}%
+  {\noindent\color{BrandOrange}\rule{0.42em}{0.42em}\hspace{0.50em}\bfseries\Large #1\par}%
+  \vspace{0.12em}{\color{BrandOrange}\rule{\textwidth}{1.25pt}\par}\vspace{0.30em}%
+}
+
+\IfFileExists{data/internal_metrics.tex}{\input{data/internal_metrics.tex}}{}
+\providecommand{\InternalSource}{synthetic placeholder; replace with intranet data}
+\providecommand{\InternalRows}{--}
+\providecommand{\MedianSpreadBps}{--}
+\providecommand{\MedianDepth}{--}
+\providecommand{\MedianImpactProxyBps}{--}
+\providecommand{\ImbalanceReturnCorr}{--}
+
+\title{Limit Order Book Research}
+\subtitle{从微观结构到可执行交易信号}
+\author{Yida Ding}
 \date{June 2026}
 
 \begin{document}
+\small
 
-\maketitle
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[BrandOrange] (current page.south west) rectangle (current page.north east);
+  \node[align=center,text=white,font=\bfseries\fontsize{24}{28}\selectfont] at ([yshift=0.8cm]current page.center) {Limit Order Book Research};
+  \node[align=center,text=white,font=\Large] at ([yshift=0.0cm]current page.center) {从微观结构到可执行交易信号};
+  \node[align=center,text=white,font=\normalsize] at ([yshift=-1.25cm]current page.center) {15-minute research briefing \quad | \quad \today};
+\end{tikzpicture}
+\end{frame}
 
-\section{Introduction}
+\begin{frame}[plain]
+\contentheader{Executive Takeaway}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.52\textwidth}
+\begin{block}{一句话结论}
+LOB 研究的价值不只是预测下一跳价格，而是把市场状态拆成 \key{方向、流动性、可成交性、风险约束}，判断信号能否转化为真实 P\&L。
+\end{block}
+\begin{itemize}\tightitems
+  \item 短周期价格预测容易被 spread、impact、queue position 吃掉。
+  \item 订单簿状态提供比价格序列更接近交易执行的状态变量。
+  \item 内网数据应重点验证：信号方向是否稳定、流动性是否足够、执行成本是否可控。
+\end{itemize}
+\end{column}
+\begin{column}{0.44\textwidth}
+\begin{tikzpicture}[node distance=0.52cm,every node/.style={font=\scriptsize}]
+\node[draw,rounded corners=2pt,fill=BrandOrangeLight,text width=4.6cm,align=center,inner sep=5pt] (a) {LOB state};
+\node[draw,rounded corners=2pt,fill=white,text width=4.6cm,align=center,inner sep=5pt,below=of a] (b) {Direction signal};
+\node[draw,rounded corners=2pt,fill=white,text width=4.6cm,align=center,inner sep=5pt,below=of b] (c) {Liquidity and execution filter};
+\node[draw,rounded corners=2pt,fill=white,text width=4.6cm,align=center,inner sep=5pt,below=of c] (d) {Tradable decision};
+\draw[-{Stealth[length=2mm]},BrandOrange,thick] (a) -- (b);
+\draw[-{Stealth[length=2mm]},BrandOrange,thick] (b) -- (c);
+\draw[-{Stealth[length=2mm]},BrandOrange,thick] (c) -- (d);
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{What a LOB State Contains}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.50\textwidth}
+\begin{itemize}\tightitems
+  \item 每个价位有 price 和 queue size：\(bid_i, ask_i, q^b_i, q^a_i\)。
+  \item 常用输入是最近 \(T\) 个时刻、前 \(L\) 档订单簿：
+  \[
+  X_t \in \mathbb{R}^{T\times 4L}.
+  \]
+  \item 关键不是一根价格线，而是 bid/ask 两侧队列随时间的形状变化。
+\end{itemize}
+\begin{block}{近端不平衡}
+\[
+I_t^{(k)}=\frac{\sum_{i=1}^k q^b_i-\sum_{i=1}^k q^a_i}{\sum_{i=1}^k q^b_i+\sum_{i=1}^k q^a_i}
+\]
+\end{block}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{tikzpicture}[x=0.88cm,y=0.38cm]
+  \draw[->,BrandGray] (0,0) -- (8.2,0);
+  \draw[->,BrandGray] (4,-0.2) -- (4,6.2);
+  \node[below,font=\scriptsize] at (4,-0.2) {mid};
+  \foreach \x/\h in {0.8/2.1,1.5/3.0,2.2/3.7,2.9/4.4,3.6/5.0} {
+    \fill[BrandGreen!75] (\x,0) rectangle +(0.45,\h);
+  }
+  \foreach \x/\h in {4.4/2.0,5.1/1.8,5.8/2.4,6.5/3.2,7.2/3.9} {
+    \fill[BrandOrange!80] (\x,0) rectangle +(0.45,\h);
+  }
+  \node[font=\scriptsize,BrandGreen] at (2.2,5.6) {bid queues};
+  \node[font=\scriptsize,BrandOrangeDark] at (6.1,5.6) {ask queues};
+\end{tikzpicture}
+\begin{block}{Price move intuition}
+当 best bid/ask 队列被 market orders 和 cancellations 消耗完，价格跳到下一档。
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Why Liquidity Is the True State Variable}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.52\textwidth}
+\begin{itemize}\tightitems
+  \item Direction tells us where price may move.
+  \item Liquidity tells us whether the move can be monetized.
+  \item Execution converts a prediction into realized P\&L.
+\end{itemize}
+\begin{block}{Decision state}
+\[
+s_t=(price,\ book,\ liquidity,\ execution,\ risk).
+\]
+\end{block}
+\end{column}
+\begin{column}{0.44\textwidth}
+\includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{liquidity_state_map.png}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Research Landscape}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.48\textwidth}
+\begin{itemize}\tightitems
+  \item Queueing models: explain price moves through queue depletion.
+  \item Hawkes processes: capture self-exciting and cross-exciting order flow.
+  \item DeepLOB: learns local spatial structure and temporal dependency.
+  \item LOBFrame / newer benchmarks: emphasize fair evaluation and market microstructure constraints.
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\includegraphics[width=\textwidth,height=0.66\textheight,keepaspectratio]{lob_research_map.png}
+\end{column}
+\end{columns}
+\source{Cont and de Larrard; Bacry et al.; Zhang et al.; recent LOB benchmark and guide papers.}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Modeling Pattern: DeepLOB as a Useful Baseline}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.48\textwidth}
+\begin{itemize}\tightitems
+  \item CNN learns local price-level and bid/ask interaction patterns.
+  \item Inception-style layers capture different local scales.
+  \item LSTM/sequence block captures recent temporal dynamics.
+  \item Output is usually a short-horizon up/down/stationary label.
+\end{itemize}
+\begin{block}{Practical message}
+Deep model matters less than having correct labels, leak-free evaluation, and executable cost-aware metrics.
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{deeplob_arch.png}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{From Prediction to Trading Signal}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.51\textwidth}
+\begin{block}{A signal is tradable only if}
+\[
+E[\Delta p] > spread + fee + impact + delay\ risk.
+\]
+\end{block}
+\begin{itemize}\tightitems
+  \item Direction: expected sign and confidence.
+  \item Liquidity: depth, spread, imbalance, resiliency.
+  \item Execution: aggressive/passive choice, queue priority, slippage.
+  \item Risk: holding horizon, inventory, adverse selection.
+\end{itemize}
+\end{column}
+\begin{column}{0.45\textwidth}
+\begin{tikzpicture}[node distance=0.45cm,every node/.style={font=\scriptsize}]
+\node[draw,fill=BrandOrangeLight,rounded corners=2pt,text width=4.8cm,align=center,inner sep=5pt] (a) {Raw model score};
+\node[draw,fill=white,rounded corners=2pt,text width=4.8cm,align=center,inner sep=5pt,below=of a] (b) {Liquidity filter};
+\node[draw,fill=white,rounded corners=2pt,text width=4.8cm,align=center,inner sep=5pt,below=of b] (c) {Execution-cost filter};
+\node[draw,fill=white,rounded corners=2pt,text width=4.8cm,align=center,inner sep=5pt,below=of c] (d) {Position sizing};
+\node[draw,fill=white,rounded corners=2pt,text width=4.8cm,align=center,inner sep=5pt,below=of d] (e) {Trade / no trade};
+\foreach \i/\j in {a/b,b/c,c/d,d/e}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Internal Data: What We Need to Validate}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.50\textwidth}
+\begin{itemize}\tightitems
+  \item Schema: timestamp, first \(L\) bid/ask prices and sizes, trades, cancellations if available.
+  \item Metrics: spread, depth, imbalance, impact proxy, resiliency.
+  \item Label: future mid-price movement at 10s/30s/1min or event horizon.
+  \item Evaluation: time split, symbol split, no leakage, cost-aware P\&L simulation.
+\end{itemize}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{Current data source}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+Rows & \InternalRows \\
+Median spread & \MedianSpreadBps\ bps \\
+Median depth & \MedianDepth \\
+Impact proxy & \MedianImpactProxyBps\ bps \\
+Imb-ret corr & \ImbalanceReturnCorr \\
+\bottomrule
+\end{tabularx}
+\end{block}
+{\tiny\color{BrandGray}Data source: \InternalSource\par}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Internal Data Snapshot}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{internal_liquidity_dashboard.png}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Signal Diagnostic}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.61\textwidth}
+\includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{internal_signal_diagnostics.png}
+\end{column}
+\begin{column}{0.35\textwidth}
+\begin{block}{How to read this}
+\begin{itemize}\tightitems
+  \item If imbalance has no stable relationship with future return, we should not trade it directly.
+  \item If it works only under tight spread/deep book regimes, it should be a conditional signal.
+  \item The final test is execution-aware P\&L, not classification accuracy.
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Recommended Research Workflow}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.50\textwidth}
+\begin{enumerate}
+  \item Build clean LOB snapshots and event-aligned labels.
+  \item Start with interpretable features: spread, depth, imbalance, impact proxy.
+  \item Benchmark simple models before DeepLOB.
+  \item Add execution filter and cost-aware backtest.
+  \item Only then test deep sequence models.
+\end{enumerate}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{Minimum viable internal study}
+\begin{itemize}\tightitems
+  \item 3--5 liquid instruments.
+  \item Multiple market regimes: open, normal, volatile, close.
+  \item Report: signal IC, turnover, cost, realized slippage, capacity.
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Roadmap and Ask}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.50\textwidth}
+\begin{block}{Next two weeks}
+\begin{itemize}\tightitems
+  \item Week 1: internal data quality, feature library, baseline diagnostics.
+  \item Week 2: cost-aware evaluation, signal filters, first strategy prototype.
+  \item Optional: DeepLOB/Transformer benchmark after baseline is stable.
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{Decision needed}
+\begin{itemize}\tightitems
+  \item Which instruments and venues should be prioritized?
+  \item What execution assumption is acceptable for the first backtest?
+  \item What capacity threshold makes the signal commercially relevant?
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\vspace{0.2em}
+\begin{center}
+{\large\bfseries\color{BrandOrangeDark}LOB research should be evaluated as an execution problem, not only a prediction problem.}
+\end{center}
+\end{frame}
 
 \end{document}

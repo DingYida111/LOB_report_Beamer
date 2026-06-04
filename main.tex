@@ -92,17 +92,17 @@ The order book is the closest observable state before execution: price direction
 \end{itemize}
 \end{column}
 \begin{column}{0.46\textwidth}
-\begin{tikzpicture}[x=0.72cm,y=0.33cm]
-  \draw[->,BrandGray] (0,0) -- (8.8,0);
-  \draw[->,BrandGray] (4.4,-0.2) -- (4.4,6.2);
-  \node[below,font=\scriptsize] at (4.4,-0.2) {mid};
-  \foreach \x/\h in {0.8/2.0,1.5/2.8,2.2/3.6,2.9/4.2,3.6/5.0} {\fill[BrandGreen!75] (\x,0) rectangle +(0.46,\h);}
-  \foreach \x/\h in {4.8/1.8,5.5/2.0,6.2/2.6,6.9/3.4,7.6/4.1} {\fill[BrandOrange!78] (\x,0) rectangle +(0.46,\h);}
-  \node[font=\scriptsize,BrandGreen] at (2.35,5.65) {bid queues};
-  \node[font=\scriptsize,BrandOrangeDark] at (6.65,5.65) {ask queues};
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.8cm] at (2.2,-1.45) {direction};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.8cm] at (4.4,-1.45) {fill probability};
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.8cm] at (6.6,-1.45) {impact risk};
+\begin{tikzpicture}[x=0.69cm,y=0.32cm]
+  \node[font=\scriptsize,BrandGreen,align=center] at (2.15,5.95) {Bid-side\\depth};
+  \node[font=\scriptsize,BrandOrangeDark,align=center] at (6.65,5.95) {Ask-side\\depth};
+  \draw[BrandGray] (0.45,0) -- (8.35,0);
+  \draw[BrandGray,densely dashed] (4.40,-0.15) -- (4.40,5.55);
+  \node[below,font=\scriptsize,BrandGray] at (4.40,-0.18) {mid price};
+  \foreach \x/\h in {0.8/1.7,1.5/2.3,2.2/3.0,2.9/3.6,3.6/4.3} {\fill[BrandGreen!75] (\x,0) rectangle +(0.46,\h);}
+  \foreach \x/\h in {4.8/1.6,5.5/1.8,6.2/2.3,6.9/2.9,7.6/3.4} {\fill[BrandOrange!78] (\x,0) rectangle +(0.46,\h);}
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.15cm,inner sep=3pt] at (1.35,-2.05) {direction};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.35cm,inner sep=3pt] at (4.35,-2.05) {fill probability};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.15cm,inner sep=3pt] at (7.30,-2.05) {impact risk};
 \end{tikzpicture}
 \end{column}
 \end{columns}
@@ -202,35 +202,36 @@ Develop an internal flow optimization layer that reduces transaction cost throug
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Value Case: RMB 90mm Target}
+\contentheader{Value Case: Leadership Focus}
 \begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.48\textwidth}
-\begin{block}{Fixed-income approximation}
-\[
-\Delta \mathrm{PnL} \approx Notional \times Duration \times Saving_{bp} \times 10^{-4}
-\]
+\begin{column}{0.45\textwidth}
+\begin{block}{Base-case opportunity}
+\begin{center}
+{\fontsize{25}{29}\selectfont\bfseries\color{BrandOrangeDark}RMB 90mm}\\
+\vspace{0.1em}
+{\small annual P\&L target}
+\end{center}
 \end{block}
 \begin{itemize}\tightitems
-  \item 2025 volume: \key{RMB 45tn}.
-  \item Average duration assumption: 2 years.
-  \item Target saving: \key{0.01 bp} average yield-cost reduction.
-  \item Annual P\&L target: \(45tn \times 2 \times 0.01 \times 10^{-4}=\) \key{RMB 90mm}.
+  \item Conservative assumption: \key{0.01 bp} average cost saving.
+  \item Source of saving: internal crossing, smarter routing, and lower impact.
+  \item Calculation detail stays in the speaking notes.
 \end{itemize}
 \end{column}
-\begin{column}{0.48\textwidth}
-\begin{tabularx}{\textwidth}{@{}r r@{}}
-\toprule
-Yield saving & Approx. annual P\&L \\
-\midrule
-\textbf{0.01 bp} & \textbf{RMB 0.09 bn} \\
-0.03 bp & RMB 0.27 bn \\
-0.05 bp & RMB 0.45 bn \\
-0.10 bp & RMB 0.90 bn \\
-\bottomrule
-\end{tabularx}
-\vspace{0.55em}
-\begin{block}{Message}
-Use \key{RMB 90mm} as the base-case annual P\&L target. Upside comes from higher saving, larger covered flow, or longer duration exposure.
+\begin{column}{0.51\textwidth}
+\begin{block}{What leadership should focus on}
+\begin{itemize}\tightitems
+  \item Can we measure execution saving cleanly?
+  \item Can Algo and internal flow share the same cost attribution framework?
+  \item Can the pilot scale from a few instruments to department-level flow?
+\end{itemize}
+\end{block}
+\begin{block}{Pilot proof}
+\begin{itemize}\tightitems
+  \item Slippage and market-impact reduction.
+  \item Internalization / crossing uplift.
+  \item Stable savings across market regimes.
+\end{itemize}
 \end{block}
 \end{column}
 \end{columns}

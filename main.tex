@@ -74,9 +74,8 @@
 \contentheader{Smart Execution as a Desk Efficiency Layer}
 \begin{center}
 \begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (manual) at (1.7,3.7) {Manual trading\\platform workflow};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (peak) at (1.7,2.25) {Quant trading\\Peak Algo};
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (scope) at (1.7,0.85) {FICC desk\\products and frequencies};
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (manual) at (1.7,3.55) {Manual trading\\platform workflow};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (peak) at (1.7,1.95) {Quant trading\\Peak Algo};
 
   \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.8cm,align=center,inner sep=6pt,font=\scriptsize\bfseries] (smart) at (6.15,2.85) {Smart Execution Layer};
   \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (micro) at (6.15,4.55) {Microstructure\\spread, depth, imbalance};
@@ -87,7 +86,7 @@
   \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (eff) at (10.9,1.75) {Desk efficiency\\slippage, impact, internalization};
   \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (pnl) at (10.9,0.35) {Attributed P\&L\\feedback loop};
 
-  \foreach \s in {manual,peak,scope}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\s.east) -- (smart.west);}
+  \foreach \s in {manual,peak}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\s.east) -- (smart.west);}
   \foreach \s in {micro,flow,hist}{\draw[-{Stealth[length=2mm]},BrandGray,thick] (\s) -- (smart);}
   \draw[-{Stealth[length=2mm]},BrandOrange,thick] (smart.east) -- (decision.west);
   \draw[-{Stealth[length=2mm]},BrandOrange,thick] (decision.south) -- (eff.north);

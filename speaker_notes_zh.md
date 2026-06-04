@@ -12,7 +12,7 @@
 
 现在 desk 主要有两条交易路径。第一条是主观交易员在交易平台上手工交易，第二条是量化交易员通过 Peak Algo 进行量化交易。覆盖的品种是 FICC，策略和频率都很多，从相对低频的组合调整，到更高频的算法执行都有。
 
-Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两条路径之间增加一层执行智能。它把三类信息融合起来：第一是 LOB 和 microstructure 信息，比如 spread、depth、imbalance；第二是 flow 和库存信息，比如 RFQ、axes、internal demand；第三是历史订单和成交信息，比如 fill rate、slippage 和 market impact。
+Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两条路径之间增加一层执行智能。它把三类信息融合起来：第一是 LOB 和 microstructure 信息，比如 spread、depth、imbalance；第二是 flow 和库存信息，比如 RFQ、axes、internal demand。这里 axes 可以口头解释为 desk 的方向性买卖兴趣，或者库存消化意愿；第三是历史订单和成交信息，比如 fill rate、slippage 和 market impact。
 
 这层智能输出的是更简洁的 order actions：什么时候交易、多激进、走内部匹配还是外部路由、如何反馈成本归因。效率收益来自更低滑点、更低冲击成本、更高内部化率，以及可衡量的 PnL attribution。
 

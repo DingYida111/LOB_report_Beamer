@@ -133,30 +133,30 @@
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Algo Plan and Literature Support}
-\begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.48\textwidth}
-\begin{block}{Implementation plan}
-\begin{enumerate}
-  \item Build LOB feature stream by execution horizon and liquidity regime.
-  \item Start with transparent features: spread, depth, imbalance, queue depletion, resiliency.
-  \item Join direction signal with Algo fill-probability engine.
-  \item Run shadow trading, then controlled A/B test.
-\end{enumerate}
-\end{block}
-\end{column}
-\begin{column}{0.48\textwidth}
-\begin{block}{Why feasible}
-\begin{itemize}\tightitems
-  \item Queue models link best-queue depletion to short-term price moves.
-  \item Hawkes-style order-flow models support regime-dependent intensity signals.
-  \item DeepLOB-style evidence shows book snapshots contain short-horizon structure.
-  \item Microstructure benchmarks warn us to evaluate by cost-aware execution metrics, not accuracy alone.
-\end{itemize}
-\end{block}
-\end{column}
-\end{columns}
-\source{Cont and de Larrard; Bacry et al.; Zhang et al. DeepLOB; recent LOB benchmark studies.}
+\contentheader{Liquidity is the True State Variable}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
+  \node[font=\scriptsize\bfseries,BrandBlue] at (1.65,4.75) {Observable signals};
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (spread) at (1.65,3.85) {Spread and depth};
+  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (queue) at (1.65,2.75) {Queue depletion\\and resiliency};
+  \node[draw=BrandPurple,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (flow) at (1.65,1.65) {Order-flow intensity};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (desk) at (1.65,0.55) {Inventory, RFQ, axes};
+
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,line width=1.0pt,text width=3.6cm,align=center,inner sep=8pt,font=\scriptsize\bfseries] (state) at (6.05,2.35) {Liquidity state\\cost | capacity | timing};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.55cm,align=center,inner sep=4pt] (decision) at (6.05,0.55) {Execution policy\\timing, aggression\\size, route};
+
+  \node[font=\scriptsize\bfseries,BrandGreen] at (10.25,4.75) {Execution outcomes};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (fill) at (10.25,3.65) {FAK fill probability};
+  \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (cost) at (10.25,2.35) {Slippage and impact};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (route) at (10.25,1.05) {Internal vs external};
+
+  \foreach \s in {spread,queue,flow,desk}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\s.east) -- (state.west);}
+  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (state) -- (decision);
+  \foreach \t in {fill,cost,route}{\draw[-{Stealth[length=2mm]},BrandGreen,thick] (state.east) -- (\t.west);}
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (decision.east) -- (route.west);
+\end{tikzpicture}
+\end{center}
+\source{Lehalle and Laruelle; Cont and de Larrard; Bacry et al.; LOBFrame / LOB benchmark studies.}
 \end{frame}
 
 \begin{frame}[plain]
@@ -174,12 +174,12 @@
 \end{tikzpicture}
 \end{column}
 \begin{column}{0.40\textwidth}
-\begin{block}{How microstructure helps}
+\begin{block}{Evidence-backed plan}
 \begin{itemize}\tightitems
-  \item Identify when external liquidity is expensive.
+  \item Segment flow by liquidity regime before routing.
   \item Prioritize internal crossing before paying spread and impact.
-  \item Route residual flow when book depth and resiliency are favorable.
-  \item Feed realized cost back into desk-level flow intelligence.
+  \item Use queue and order-flow signals for residual external execution.
+  \item Validate by internalization uplift and residual external cost.
 \end{itemize}
 \end{block}
 \end{column}

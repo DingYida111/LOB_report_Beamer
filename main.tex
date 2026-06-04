@@ -202,7 +202,7 @@ Develop an internal flow optimization layer that reduces transaction cost throug
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Value Case: P\&L Math and Sensitivity}
+\contentheader{Value Case: RMB 90mm Target}
 \begin{columns}[T,totalwidth=\textwidth]
 \begin{column}{0.48\textwidth}
 \begin{block}{Fixed-income approximation}
@@ -213,8 +213,8 @@ Develop an internal flow optimization layer that reduces transaction cost throug
 \begin{itemize}\tightitems
   \item 2025 volume: \key{RMB 45tn}.
   \item Average duration assumption: 2 years.
-  \item At \(0.01\) bp yield saving: \(45tn \times 2 \times 0.01 \times 10^{-4}=\) \key{RMB 90mm}.
-  \item RMB 1bn requires about \key{0.11 bp} yield saving under the same assumptions.
+  \item Target saving: \key{0.01 bp} average yield-cost reduction.
+  \item Annual P\&L target: \(45tn \times 2 \times 0.01 \times 10^{-4}=\) \key{RMB 90mm}.
 \end{itemize}
 \end{column}
 \begin{column}{0.48\textwidth}
@@ -222,16 +222,15 @@ Develop an internal flow optimization layer that reduces transaction cost throug
 \toprule
 Yield saving & Approx. annual P\&L \\
 \midrule
-0.01 bp & RMB 0.09 bn \\
+\textbf{0.01 bp} & \textbf{RMB 0.09 bn} \\
+0.03 bp & RMB 0.27 bn \\
 0.05 bp & RMB 0.45 bn \\
 0.10 bp & RMB 0.90 bn \\
-0.11 bp & RMB 0.99 bn \\
-0.20 bp & RMB 1.80 bn \\
 \bottomrule
 \end{tabularx}
 \vspace{0.55em}
 \begin{block}{Message}
-The value case remains material, but the RMB 1bn claim should be framed as a \key{0.10--0.11 bp} saving target, not \(0.01\) bp.
+Use \key{RMB 90mm} as the base-case annual P\&L target. Upside comes from higher saving, larger covered flow, or longer duration exposure.
 \end{block}
 \end{column}
 \end{columns}

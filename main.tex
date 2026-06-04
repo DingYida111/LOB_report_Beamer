@@ -30,7 +30,11 @@
 \definecolor{BrandInk}{RGB}{34,34,34}
 \definecolor{BrandGray}{RGB}{91,91,91}
 \definecolor{BrandBlue}{RGB}{28,76,132}
+\definecolor{BrandBlueLight}{RGB}{226,239,255}
 \definecolor{BrandGreen}{RGB}{34,124,86}
+\definecolor{BrandGreenLight}{RGB}{229,246,237}
+\definecolor{BrandPurple}{RGB}{96,71,143}
+\definecolor{BrandPurpleLight}{RGB}{239,233,249}
 
 \setbeamertemplate{navigation symbols}{}
 \setbeamercolor{normal text}{fg=BrandInk,bg=white}
@@ -40,30 +44,25 @@
 \setbeamertemplate{itemize item}{\color{BrandOrange}$\blacktriangleright$}
 \setbeamertemplate{itemize subitem}{\color{BrandOrange}$\bullet$}
 
-\setlength{\parskip}{0.14em}
+\setlength{\parskip}{0.12em}
 \setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.12}
+\renewcommand{\arraystretch}{1.10}
 
-\newcommand{\tightitems}{\setlength{\itemsep}{0.24em}}
+\newcommand{\tightitems}{\setlength{\itemsep}{0.20em}}
 \newcommand{\source}[1]{{\vspace{0.05em}\tiny\color{BrandGray}Source: #1\par}}
 \newcommand{\key}[1]{\textcolor{BrandOrangeDark}{\textbf{#1}}}
 \newcommand{\muted}[1]{\textcolor{BrandGray}{#1}}
 \newcommand{\contentheader}[1]{%
   \vspace*{0.02em}%
   {\noindent\color{BrandOrange}\rule{0.42em}{0.42em}\hspace{0.50em}\bfseries\Large #1\par}%
-  \vspace{0.12em}{\color{BrandOrange}\rule{\textwidth}{1.25pt}\par}\vspace{0.30em}%
+  \vspace{0.10em}{\color{BrandOrange}\rule{\textwidth}{1.25pt}\par}\vspace{0.25em}%
+}
+\newcommand{\metricbox}[3]{%
+  \node[draw=#2,fill=#3,rounded corners=2pt,align=center,inner sep=5pt,text width=2.85cm,font=\scriptsize] {#1};%
 }
 
-\IfFileExists{data/internal_metrics.tex}{\input{data/internal_metrics.tex}}{}
-\providecommand{\InternalSource}{synthetic placeholder; replace with intranet data}
-\providecommand{\InternalRows}{--}
-\providecommand{\MedianSpreadBps}{--}
-\providecommand{\MedianDepth}{--}
-\providecommand{\MedianImpactProxyBps}{--}
-\providecommand{\ImbalanceReturnCorr}{--}
-
-\title{Limit Order Book Research}
-\subtitle{From Microstructure to Executable Signals}
+\title{Limit Order Book Execution Plan}
+\subtitle{Algo Type1 Signals and Internal Flow Optimization}
 \author{Yida Ding}
 \date{June 2026}
 
@@ -73,180 +72,203 @@
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
   \fill[BrandOrange] (current page.south west) rectangle (current page.north east);
-  \node[align=center,text=white,font=\bfseries\fontsize{24}{28}\selectfont] at ([yshift=0.8cm]current page.center) {Limit Order Book Research};
-  \node[align=center,text=white,font=\Large] at ([yshift=0.0cm]current page.center) {From Microstructure to Executable Signals};
-  \node[align=center,text=white,font=\normalsize] at ([yshift=-1.25cm]current page.center) {15-minute research briefing \quad | \quad \today};
+  \node[align=center,text=white,font=\bfseries\fontsize{23}{27}\selectfont] at ([yshift=0.82cm]current page.center) {Limit Order Book Execution Plan};
+  \node[align=center,text=white,font=\Large] at ([yshift=0.02cm]current page.center) {Algo Type1 Signals and Internal Flow Optimization};
+  \node[align=center,text=white,font=\normalsize] at ([yshift=-1.20cm]current page.center) {15-minute leadership briefing \quad | \quad \today};
 \end{tikzpicture}
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Executive Message}
-\begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.53\textwidth}
-\begin{block}{Core claim}
-LOB research should be evaluated as an \key{execution problem}, not only a prediction problem.
-\end{block}
-\begin{itemize}\tightitems
-  \item Price direction is useful only if it survives spread, impact, latency, and inventory risk.
-  \item The order book gives a tradable market state: queue depth, imbalance, liquidity, and resiliency.
-  \item Our internal study should start with liquidity-aware diagnostics before complex models.
-\end{itemize}
-\end{column}
-\begin{column}{0.43\textwidth}
-\begin{tikzpicture}[node distance=0.50cm,every node/.style={font=\scriptsize}]
-\node[draw,rounded corners=2pt,fill=BrandOrangeLight,text width=4.8cm,align=center,inner sep=5pt] (a) {LOB state};
-\node[draw,rounded corners=2pt,fill=white,text width=4.8cm,align=center,inner sep=5pt,below=of a] (b) {Direction signal};
-\node[draw,rounded corners=2pt,fill=white,text width=4.8cm,align=center,inner sep=5pt,below=of b] (c) {Liquidity and cost filter};
-\node[draw,rounded corners=2pt,fill=white,text width=4.8cm,align=center,inner sep=5pt,below=of c] (d) {Executable decision};
-\foreach \i/\j in {a/b,b/c,c/d}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
-\end{tikzpicture}
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}[plain]
-\contentheader{What the Book Adds Beyond Price}
-\begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.52\textwidth}
-\begin{itemize}\tightitems
-  \item A LOB records resting buy and sell queues across price levels.
-  \item A typical model input is a recent history of the first \(L\) levels:
-  \[
-  X_t\in\mathbb{R}^{T\times4L}.
-  \]
-  \item Queue depletion explains why the next price change happens.
-  \item Queue imbalance gives a first-order pressure measure:
-  \[
-  I_t^{(k)}=\frac{\sum_{i=1}^k q^b_i-\sum_{i=1}^k q^a_i}{\sum_{i=1}^k q^b_i+\sum_{i=1}^k q^a_i}.
-  \]
-\end{itemize}
-\end{column}
-\begin{column}{0.44\textwidth}
-\begin{tikzpicture}[x=0.86cm,y=0.34cm]
-  \draw[->,BrandGray] (0,0) -- (8.2,0);
-  \draw[->,BrandGray] (4,-0.2) -- (4,6.2);
-  \node[below,font=\scriptsize] at (4,-0.2) {mid};
-  \foreach \x/\h in {0.8/2.1,1.5/3.0,2.2/3.7,2.9/4.4,3.6/5.0} {\fill[BrandGreen!75] (\x,0) rectangle +(0.45,\h);}
-  \foreach \x/\h in {4.4/2.0,5.1/1.8,5.8/2.4,6.5/3.2,7.2/3.9} {\fill[BrandOrange!80] (\x,0) rectangle +(0.45,\h);}
-  \node[font=\scriptsize,BrandGreen] at (2.2,5.6) {bid queues};
-  \node[font=\scriptsize,BrandOrangeDark] at (6.1,5.6) {ask queues};
-\end{tikzpicture}
-\begin{block}{Practical meaning}
-The market state is a short movie of queue shapes, not a price line.
-\end{block}
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}[plain]
-\contentheader{Liquidity Is the Tradable State}
+\contentheader{One-Page Context}
 \begin{columns}[T,totalwidth=\textwidth]
 \begin{column}{0.50\textwidth}
-\begin{block}{A trade is viable only when}
-\[
-E[\Delta p] > spread + fee + impact + delay\ risk.
-\]
+\begin{block}{Why LOB matters}
+The order book is the closest observable state before execution: price direction, queue depth, fill probability, and impact risk are visible together.
 \end{block}
 \begin{itemize}\tightitems
-  \item Spread measures immediate trading friction.
-  \item Depth and impact determine capacity.
-  \item Resiliency determines how quickly the book recovers.
-  \item Slippage is the operational truth of the signal.
+  \item Keep the technical introduction to one page.
+  \item Use LOB features to improve execution, not only to predict price.
+  \item Focus on two deliverables: \key{Algo Type1} and \key{department-level internal flow}.
 \end{itemize}
 \end{column}
 \begin{column}{0.46\textwidth}
-\includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{liquidity_state_map.png}
+\begin{tikzpicture}[x=0.72cm,y=0.33cm]
+  \draw[->,BrandGray] (0,0) -- (8.8,0);
+  \draw[->,BrandGray] (4.4,-0.2) -- (4.4,6.2);
+  \node[below,font=\scriptsize] at (4.4,-0.2) {mid};
+  \foreach \x/\h in {0.8/2.0,1.5/2.8,2.2/3.6,2.9/4.2,3.6/5.0} {\fill[BrandGreen!75] (\x,0) rectangle +(0.46,\h);}
+  \foreach \x/\h in {4.8/1.8,5.5/2.0,6.2/2.6,6.9/3.4,7.6/4.1} {\fill[BrandOrange!78] (\x,0) rectangle +(0.46,\h);}
+  \node[font=\scriptsize,BrandGreen] at (2.35,5.65) {bid queues};
+  \node[font=\scriptsize,BrandOrangeDark] at (6.65,5.65) {ask queues};
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.8cm] at (2.2,-1.45) {direction};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.8cm] at (4.4,-1.45) {fill probability};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,align=center,font=\scriptsize,text width=2.8cm] at (6.6,-1.45) {impact risk};
+\end{tikzpicture}
 \end{column}
 \end{columns}
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{What the Literature Suggests}
+\contentheader{Output 1: Algo Type1 Execution Alpha}
 \begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.49\textwidth}
-\begin{itemize}\tightitems
-  \item Queueing and Hawkes models explain microstructure mechanics.
-  \item DeepLOB shows that book snapshots can carry short-horizon signal.
-  \item Recent benchmarks warn that evaluation can be fragile across datasets, horizons, and market regimes.
-  \item For our use case, the first milestone is not the most complex model; it is a reliable, cost-aware research pipeline.
-\end{itemize}
+\begin{column}{0.57\textwidth}
+\begin{tikzpicture}[node distance=0.38cm,every node/.style={font=\scriptsize}]
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=4.0cm,align=center,inner sep=4pt] (lob) {LOB features\\spread, depth, imbalance, resiliency};
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=4.0cm,align=center,inner sep=4pt,below=of lob] (sig) {15--130 min market-direction signal};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=4.0cm,align=center,inner sep=4pt,below=of sig] (prob) {Real-time fill probability\\from Algo state and queue position};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=4.0cm,align=center,inner sep=4pt,below=of prob] (act) {Type1 active order decision\\timing, level, aggressiveness};
+  \foreach \i/\j in {lob/sig,sig/prob,prob/act}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt,right=0.28cm of prob] (out) {Higher fill rate\\Lower slippage\\Lower market impact};
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (act.east) -- ++(0.25,0) |- (out.south);
+\end{tikzpicture}
 \end{column}
-\begin{column}{0.47\textwidth}
-\includegraphics[width=\textwidth,height=0.68\textheight,keepaspectratio]{lob_research_map.png}
-\end{column}
-\end{columns}
-\source{Cont and de Larrard; Bacry et al.; Zhang et al.; recent LOB benchmark studies.}
-\end{frame}
-
-\begin{frame}[plain]
-\contentheader{Internal Data Diagnostics}
-\begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.62\textwidth}
-\includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{internal_liquidity_dashboard.png}
-\end{column}
-\begin{column}{0.34\textwidth}
-\begin{block}{Current snapshot}
-\begin{tabularx}{\textwidth}{@{}lX@{}}
-\toprule
-Rows & \InternalRows \\
-Median spread & \MedianSpreadBps\ bps \\
-Median depth & \MedianDepth \\
-Impact proxy & \MedianImpactProxyBps\ bps \\
-\bottomrule
-\end{tabularx}
+\begin{column}{0.39\textwidth}
+\begin{block}{Business use}
+Support the current Algo instance for \key{Type1 active order placement}.
 \end{block}
 \begin{itemize}\tightitems
-  \item Replace placeholder with intranet-generated figures.
-  \item Focus on spread, depth, imbalance, and impact stability.
+  \item Signal horizon: 15, 30, 60, 90, 130 minutes.
+  \item Combine market direction with execution probability.
+  \item Improve fill probability when direction is favorable.
+  \item Avoid chasing in adverse LOB regimes.
 \end{itemize}
 \end{column}
 \end{columns}
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{From Diagnostics to Signal}
-\begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.61\textwidth}
-\includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{internal_signal_diagnostics.png}
-\end{column}
-\begin{column}{0.35\textwidth}
-\begin{block}{Interpretation}
-\begin{itemize}\tightitems
-  \item If imbalance has no stable relation with future return, it is not a standalone signal.
-  \item If it works only under tight-spread regimes, it should be conditional.
-  \item The final score is execution-aware P\&L, not classification accuracy.
-\end{itemize}
-\end{block}
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}[plain]
-\contentheader{Proposed Next Step}
+\contentheader{Output 1: Delivery Plan and KPIs}
 \begin{columns}[T,totalwidth=\textwidth]
 \begin{column}{0.50\textwidth}
-\begin{block}{Two-week plan}
+\begin{block}{Prototype path}
+\begin{enumerate}
+  \item Build LOB feature stream and direction labels.
+  \item Train interpretable baseline signals by horizon.
+  \item Join signal with Algo fill-probability engine.
+  \item Run shadow trading, then controlled live A/B test.
+\end{enumerate}
+\end{block}
+\end{column}
+\begin{column}{0.46\textwidth}
+{\scriptsize
+\begin{tabular}{@{}p{2.2cm}p{4.0cm}@{}}
+\toprule
+KPI & Measurement \\
+\midrule
+Fill rate uplift & Type1 fills vs. baseline by regime \\
+Slippage saving & bps vs. arrival / decision price \\
+Impact control & post-trade adverse move \\
+Model stability & hit rate and IC across horizons \\
+\bottomrule
+\end{tabular}
+}
+\vspace{0.45em}
+\begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
+  \draw[BrandGray,thick] (0,0) -- (5.3,0);
+  \foreach \x/\txt in {0/{Data},1.75/{Shadow},3.5/{A/B},5.3/{Scale}} {
+    \fill[BrandOrange] (\x,0) circle (2pt);
+    \node[below=0.13cm,align=center] at (\x,0) {\txt};
+  }
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Output 2: Department Internal Flow Engine}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.58\textwidth}
+\begin{tikzpicture}[node distance=0.40cm,every node/.style={font=\scriptsize}]
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt] (client) {Client / desk orders};
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt,below=of client] (flow) {Internal flow map\\inventory, RFQ, inquiry, axes};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt,below=of flow] (match) {Internal crossing\\and smart routing};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=4pt,below=of match] (ext) {External execution\\only residual risk};
+  \foreach \i/\j in {client/flow,flow/match,match/ext}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=4pt,right=0.42cm of match] (benefit) {Lower cost\\Higher internalization\\Better risk transfer};
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (match.east) -- (benefit.west);
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.38\textwidth}
+\begin{block}{Department-level target}
+Develop an internal flow optimization layer that reduces transaction cost through internal crossing, better routing, and pre-trade liquidity selection.
+\end{block}
 \begin{itemize}\tightitems
-  \item Week 1: data quality, feature library, baseline diagnostics.
-  \item Week 2: cost-aware backtest, liquidity filters, first strategy prototype.
-  \item DeepLOB / Transformer benchmark after the simple baseline is stable.
+  \item Convert historical flow into actionable liquidity intelligence.
+  \item Match compatible internal demand before external trading.
+  \item Use LOB and flow signals to choose execution timing.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Value Case: P\&L Math and Sensitivity}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.48\textwidth}
+\begin{block}{Fixed-income approximation}
+\[
+\Delta \mathrm{PnL} \approx Notional \times Duration \times Saving_{bp} \times 10^{-4}
+\]
+\end{block}
+\begin{itemize}\tightitems
+  \item 2025 volume: \key{RMB 45tn}.
+  \item Average duration assumption: 2 years.
+  \item At \(0.01\) bp yield saving: \(45tn \times 2 \times 0.01 \times 10^{-4}=\) \key{RMB 90mm}.
+  \item RMB 1bn requires about \key{0.11 bp} yield saving under the same assumptions.
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{tabularx}{\textwidth}{@{}r r@{}}
+\toprule
+Yield saving & Approx. annual P\&L \\
+\midrule
+0.01 bp & RMB 0.09 bn \\
+0.05 bp & RMB 0.45 bn \\
+0.10 bp & RMB 0.90 bn \\
+0.11 bp & RMB 0.99 bn \\
+0.20 bp & RMB 1.80 bn \\
+\bottomrule
+\end{tabularx}
+\vspace{0.55em}
+\begin{block}{Message}
+The value case remains material, but the RMB 1bn claim should be framed as a \key{0.10--0.11 bp} saving target, not \(0.01\) bp.
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Roadmap and Leadership Ask}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.50\textwidth}
+\begin{block}{Two workstreams}
+\begin{itemize}\tightitems
+  \item \key{Algo Type1:} 15--130 min direction signal plus fill-probability integration.
+  \item \key{Internal flow:} internal crossing, routing, and liquidity selection engine.
+\end{itemize}
+\end{block}
+\begin{block}{Near-term milestones}
+\begin{itemize}\tightitems
+  \item 2 weeks: data audit, baseline features, signal dashboard.
+  \item 4--6 weeks: shadow trading and internal-flow simulator.
+  \item 8--12 weeks: controlled production pilot.
 \end{itemize}
 \end{block}
 \end{column}
 \begin{column}{0.46\textwidth}
 \begin{block}{Decision needed}
 \begin{itemize}\tightitems
-  \item Priority instruments and venues.
-  \item First execution assumption: aggressive, passive, or hybrid.
-  \item Minimum capacity threshold for commercial relevance.
+  \item Confirm priority instruments and Algo instance.
+  \item Approve access to LOB, order, fill, and internal flow data.
+  \item Align on P\&L attribution: slippage, market impact, and internal crossing savings.
 \end{itemize}
 \end{block}
-\end{column}
-\end{columns}
 \vspace{0.35em}
 \begin{center}
-{\large\bfseries\color{BrandOrangeDark}Build the execution-aware pipeline first; add deep models after the baseline is trustworthy.}
+{\large\bfseries\color{BrandOrangeDark}Deliver execution alpha first, then scale it into a department-level flow product.}
 \end{center}
+\end{column}
+\end{columns}
 \end{frame}
 
 \end{document}

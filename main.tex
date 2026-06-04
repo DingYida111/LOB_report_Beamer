@@ -134,28 +134,45 @@
 
 \begin{frame}[plain]
 \contentheader{Liquidity is the True State Variable}
-\begin{center}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.48\textwidth}
 \begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
-  \node[font=\scriptsize\bfseries,BrandBlue] at (1.65,4.75) {Observable signals};
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (spread) at (1.65,3.85) {Spread and depth};
-  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (queue) at (1.65,2.75) {Queue depletion\\and resiliency};
-  \node[draw=BrandPurple,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (flow) at (1.65,1.65) {Order-flow intensity};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (desk) at (1.65,0.55) {Inventory, RFQ, axes};
-
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,line width=1.0pt,text width=3.6cm,align=center,inner sep=8pt,font=\scriptsize\bfseries] (state) at (6.05,2.35) {Liquidity state\\cost | capacity | timing};
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.55cm,align=center,inner sep=4pt] (decision) at (6.05,0.55) {Execution policy\\timing, aggression\\size, route};
-
-  \node[font=\scriptsize\bfseries,BrandGreen] at (10.25,4.75) {Execution outcomes};
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (fill) at (10.25,3.65) {FAK fill probability};
-  \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (cost) at (10.25,2.35) {Slippage and impact};
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.0cm,align=center,inner sep=4pt] (route) at (10.25,1.05) {Internal vs external};
-
-  \foreach \s in {spread,queue,flow,desk}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\s.east) -- (state.west);}
-  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (state) -- (decision);
-  \foreach \t in {fill,cost,route}{\draw[-{Stealth[length=2mm]},BrandGreen,thick] (state.east) -- (\t.west);}
-  \draw[-{Stealth[length=2mm]},BrandGray,thick] (decision.east) -- (route.west);
+  \node[align=left,text width=5.3cm] at (2.75,4.25) {\(\mathcal{L}_t=\{\)cost, capacity, immediacy, resiliency, toxicity, internal fit\(\}\)};
+  \begin{scope}[shift={(2.75,2.2)}]
+    \foreach \r in {0.55,1.10,1.65}{
+      \draw[BrandGray!35] (90:\r) -- (30:\r) -- (-30:\r) -- (-90:\r) -- (-150:\r) -- (150:\r) -- cycle;
+    }
+    \foreach \a in {90,30,-30,-90,-150,150}{\draw[BrandGray!45] (0,0) -- (\a:1.72);}
+    \fill[BrandOrangeLight,opacity=0.86] (90:1.05) -- (30:1.40) -- (-30:1.00) -- (-90:1.22) -- (-150:0.70) -- (150:1.45) -- cycle;
+    \draw[BrandOrange,thick] (90:1.05) -- (30:1.40) -- (-30:1.00) -- (-90:1.22) -- (-150:0.70) -- (150:1.45) -- cycle;
+    \foreach \p in {(90:1.05),(30:1.40),(-30:1.00),(-90:1.22),(-150:0.70),(150:1.45)}{\fill[BrandOrange] \p circle (1.4pt);}
+    \node[BrandInk,font=\scriptsize\bfseries] at (90:2.03) {Cost};
+    \node[BrandInk,font=\scriptsize\bfseries] at (30:2.25) {Capacity};
+    \node[BrandInk,font=\scriptsize\bfseries] at (-30:2.18) {Immediacy};
+    \node[BrandInk,font=\scriptsize\bfseries] at (-90:2.03) {Resiliency};
+    \node[BrandInk,font=\scriptsize\bfseries] at (-150:2.25) {Toxicity};
+    \node[BrandInk,font=\scriptsize\bfseries] at (150:2.30) {Internal fit};
+    \node[align=center,font=\scriptsize\bfseries,text width=1.2cm] at (0,0) {liquidity\\state};
+  \end{scope}
 \end{tikzpicture}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{How to read the state}
+\begin{itemize}\tightitems
+  \item \key{High capacity + fast resiliency:} raise FAK confidence.
+  \item \key{High cost or toxicity:} revise fill expectation and aggression.
+  \item \key{High internal fit:} cross internally before external routing.
+  \item \key{Weak state:} delay, slice smaller, or hedge earlier.
+\end{itemize}
+\end{block}
+\vspace{0.25em}
+\begin{block}{Design rule}
+\begin{center}
+{\bfseries Price is the observation. Liquidity is the control state.}
 \end{center}
+\end{block}
+\end{column}
+\end{columns}
 \source{Lehalle and Laruelle; Cont and de Larrard; Bacry et al.; LOBFrame / LOB benchmark studies.}
 \end{frame}
 

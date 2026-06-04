@@ -34,11 +34,11 @@ Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两
 
 论文里虽然有很多模型，比如 DeepLOB、HLOB、LOBFrame，但落到执行上，最重要的不是模型名字，而是我们到底在估计什么状态。我的理解是：我们不是单纯预测价格，而是在估计当前市场的 liquidity state。
 
-左边这些是可观测信号：spread 和 depth 说明交易摩擦和可交易容量；queue depletion 和 resiliency 说明盘口被消耗后能不能恢复；order-flow intensity 说明市场当前成交和撤单强度；inventory、RFQ 和 axes 说明内部需求和风险转移机会。
+图上的 \(\mathcal{L}_t\) 可以理解成 liquidity state vector。它不是一个单一指标，而是由 cost、capacity、immediacy、resiliency、toxicity 和 internal fit 这些维度组成。
 
-中间的 liquidity state 可以拆成三件事：cost、capacity 和 timing。也就是外部成交的成本是多少、能承接多少量、什么时候成交更合适。
+雷达图的好处是更直观：不是每个市场状态都只用“好/坏”判断，而是看 liquidity profile 的形状。比如有的状态是容量很好但 toxicity 高，有的状态是外部 liquidity 贵但 internal fit 很高。
 
-右边才是执行输出：FAK 的成交概率、slippage 和 market impact，以及到底应该内部化还是外部执行。
+这就直接决定 execution policy：capacity 和 resiliency 好的时候，可以提高 FAK 的信心；cost 或 toxicity 高的时候，要修正成交预期和激进程度；internal fit 高的时候，应该先考虑 internal crossing；如果整体 state 很弱，就要延迟、切小或者提前 hedge。
 
 这页的重点是把论文支撑讲成一个可执行的系统框架：market microstructure 的价值，不只是预测涨跌，而是把 spread、depth、resiliency、order flow、internal demand 转成 liquidity state，再转成执行动作。
 

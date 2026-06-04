@@ -1,42 +1,52 @@
-# LOB 5 页领导汇报讲稿
+# Smart Execution 6 页领导汇报讲稿
 
-## 1. Applications of LOB and Microstructure
+## 1. Liquidity-Aware Smart Execution for Desk Efficiency
 
 这一页只做封面，不展开内容。
 
-开场可以一句话带过：今天主要汇报 LOB 和 microstructure 在交易执行里的两个具体应用，一个是当前 Algo Type1 的 execution alpha，另一个是部门级 internal flow 的利用效率提升。
+开场可以一句话带过：今天主要汇报如何用 LOB、microstructure 和 liquidity signals 构建 Smart Execution，提升整个 FICC desk 的执行效率。
 
-## 2. Algo Type1 Execution Alpha
+## 2. Smart Execution as a Desk Efficiency Layer
 
-这一页讲第一条主线：Algo Type1 execution alpha。
+这一页用一张图说明 Smart Execution 在整个 desk 里的位置。
 
-流程上，LOB 特征先生成 15 到 130 分钟的市场方向信号，再和 Algo 当前的实时成交概率结合，包括当前队列位置、剩余量、盘口深度和历史成交行为。最终输出不是简单买卖信号，而是 Type1 主动点单的执行决策：什么时候点、点在哪一档、要多激进。
+现在 desk 主要有两条交易路径。第一条是主观交易员在交易平台上手工交易，第二条是量化交易员通过 Peak Algo 进行量化交易。覆盖的品种是 FICC，策略和频率都很多，从相对低频的组合调整，到更高频的算法执行都有。
+
+Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两条路径之间增加一层执行智能。它把三类信息融合起来：第一是 LOB 和 microstructure 信息，比如 spread、depth、imbalance；第二是 flow 和库存信息，比如 RFQ、axes、internal demand。这里 axes 可以口头解释为 desk 的方向性买卖兴趣，或者库存消化意愿；第三是历史订单和成交信息，比如 fill rate、slippage 和 market impact。
+
+这层智能输出的是更简洁的 order actions：什么时候交易、多激进、走内部匹配还是外部路由、如何反馈成本归因。效率收益来自更低滑点、更低冲击成本、更高内部化率，以及可衡量的 PnL attribution。
+
+## 3. FAK Order Execution Alpha
+
+这一页讲第一条主线：FAK order execution alpha。
+
+流程上，LOB 特征先生成 direction 和 liquidity regime 信号，再和 Algo 当前的实时成交概率结合，包括当前队列位置、剩余量、盘口深度和历史成交行为。这里不要在图上强调 15 到 130 分钟，因为它容易被误解成 raw LOB 对这个 horizon 的直接价格预测。更准确的讲法是：这些信号按执行窗口和流动性状态更新，最终输出不是简单买卖信号，而是 FAK order 的执行决策：什么时候点、点在哪一档、要多激进。
 
 这里要讲清楚两个场景。
 
-第一个场景是市场方向有利。比如我们要买，LOB 信号显示后续市场方向也偏上，成交概率更高，这时主动点单更容易产生 execution alpha，体现为更低滑点、更低 market impact。
+第一个场景是市场方向有利。比如我们要买，LOB 信号显示后续市场方向也偏上，成交概率更高，这时 FAK order 更容易产生 execution alpha，体现为更低滑点、更低 market impact。
 
-第二个场景是市场方向不利。比如我们要买，但 LOB 方向和成交概率都不支持，这时不应该盲目维持原来的 Type1 预期，而应该修正成交预期和激进程度。这样可以提高交易成功率，同时减少没有及时 hedge 带来的 unhedged risk。
+第二个场景是市场方向不利。比如我们要买，但 LOB 方向和成交概率都不支持，这时不应该盲目维持原来的 FAK order 预期，而应该修正成交预期和激进程度。这样可以提高交易成功率，同时减少没有及时 hedge 带来的 unhedged risk。
 
-## 3. Algo Plan and Literature Support
+## 4. Liquidity is the True State Variable
 
-这一页继续讲 Algo Type1，但重点放在计划和理论佐证。
+这一页讲一个更底层、也更经典的结论：liquidity 才是真正的 state variable。
 
-实施计划上，第一步是按 15、30、60、90、130 分钟不同 horizon 建 LOB 特征流和方向标签。第二步先做透明特征，包括 spread、depth、imbalance、queue depletion 和 resiliency。第三步把方向信号接入 Algo 成交概率引擎。第四步先 shadow trading，再做小范围 A/B test。
+论文里虽然有很多模型，比如 DeepLOB、HLOB、LOBFrame，但落到执行上，最重要的不是模型名字，而是我们到底在估计什么状态。我的理解是：我们不是单纯预测价格，而是在估计当前市场的 liquidity state。
 
-文献上可以用三类研究来支撑。
+左边这些是可观测信号：spread 和 depth 说明交易摩擦和可交易容量；queue depletion 和 resiliency 说明盘口被消耗后能不能恢复；order-flow intensity 说明市场当前成交和撤单强度；inventory、RFQ 和 axes 说明内部需求和风险转移机会。
 
-第一，Cont 和 de Larrard 这一类 queueing model 说明，best bid 和 best ask 队列被消耗时，短期价格移动有明确的微观结构机制。
+中间的 liquidity state 可以拆成三件事：cost、capacity 和 timing。也就是外部成交的成本是多少、能承接多少量、什么时候成交更合适。
 
-第二，Bacry 等人的 Hawkes/order-flow 研究说明，订单流有自激发和聚集特征，所以短期强弱方向和成交强度本身是可以建模的，但要注意 regime dependence。
+右边才是执行输出：FAK 的成交概率、slippage 和 market impact，以及到底应该内部化还是外部执行。
 
-第三，DeepLOB 和后续 benchmark 说明，订单簿快照和短期序列确实包含预测结构；但 benchmark 也提醒我们，不能只看分类准确率，必须看扣除交易成本后的执行指标。
+这页的重点是把论文支撑讲成一个可执行的系统框架：market microstructure 的价值，不只是预测涨跌，而是把 spread、depth、resiliency、order flow、internal demand 转成 liquidity state，再转成执行动作。
 
-所以我们的策略是先做可解释、成本感知的 baseline，再决定是否上 DeepLOB 或 Transformer。
+文献支撑可以简短带过：Lehalle 和 Laruelle 强调 liquidity 是执行的核心变量；Cont 和 de Larrard 说明 queue depletion 对短期价格形成有机制性影响；Bacry 等人的 Hawkes/order-flow 研究说明订单流强度有 regime dependence；DeepLOB、LOBFrame 和 benchmark 研究说明 LOB 有预测结构，但必须用成本感知指标评估。
 
-## 4. Microstructure for Internal Flow
+## 5. Microstructure for Internal Flow
 
-第四页讲第二条主线：microstructure 如何提升 internal flow 利用效率。
+这一页讲第二条主线：microstructure 如何提升 internal flow 利用效率。
 
 如果只看单笔订单，LOB 信号解决的是执行时点和点单方式。但从部门层面看，我们可以把客户订单、desk orders、RFQ、库存、axes 和历史成交整合成 internal flow map。
 
@@ -44,7 +54,9 @@
 
 这页要强调，microstructure 不是单独做一个模型，而是提升 internal flow 利用效率的一层执行智能：什么时候内部化，什么时候外部化，外部化时怎么减少成本。
 
-## 5. How We Save 0.01 bp Per Trade
+计划上可以补一句：先做透明的 liquidity-state baseline，包括 spread、depth、imbalance、queue depletion 和 resiliency；再接入 FAK fill probability 和 internal flow map；先 shadow trading，再小范围 A/B test。评价指标不看模型准确率本身，而看 internalization uplift、residual external cost、slippage 和 post-trade impact。
+
+## 6. How We Save 0.01 bp Per Trade
 
 最后一页讲 0.01bp 是怎么省出来的，以及如何证明。
 

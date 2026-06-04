@@ -1,50 +1,78 @@
-# 15 分钟汇报讲稿
+# LOB 15 分钟汇报讲稿
 
-## 1. 标题
+## 1. Title
 
-今天汇报的主题是 Limit Order Book，也就是从微观结构理解短周期交易信号。核心不是证明某个模型很先进，而是说明我们应该怎样把订单簿状态转化成可执行的交易研究框架。
+今天汇报 Limit Order Book 研究。我的重点不是把所有文献讲一遍，而是回答一个更实际的问题：订单簿研究怎样从微观结构信号，变成可执行的交易研究框架。
 
-## 2. Executive Takeaway
+这版汇报控制在 8 页，每页大约 1.5 到 2 分钟。
 
-我的结论是：LOB 研究的价值不只是预测下一跳价格，而是同时回答方向、流动性、可成交性和风险约束。短周期里，一个方向预测即便准确，也可能被 spread、impact 和延迟消耗掉。因此研究重点要从“模型准确率”转向“可执行 PnL”。
+## 2. Executive Message
 
-## 3. What a LOB State Contains
+核心观点是：LOB 研究不应该只被当成预测问题，而应该被当成执行问题。
 
-订单簿不是一根价格线，而是 bid/ask 两侧多个价位的队列。模型看到的是最近一段时间内这些队列的形状变化。最基础的指标是近端不平衡：买方深度和卖方深度的差除以总深度。它可以刻画短期压力，但不能单独作为交易策略。
+价格方向预测本身不够。即使模型预测下一段价格会上涨，只要这个预期收益小于 spread、手续费、冲击成本和延迟风险，交易上仍然没有价值。
 
-## 4. Liquidity Is the True State Variable
+所以我们真正要构建的是一条从 LOB state 到 direction signal，再到 liquidity and cost filter，最后到 executable decision 的链路。
 
-价格告诉我们市场结果，流动性告诉我们这个结果能不能交易。真实交易里，我们关心的是能不能进出、能交易多少、要付多少 spread 和 impact、订单簿被打穿后恢复多快。所以状态变量必须包括 price、book、liquidity、execution 和 risk。
+这也是我建议内部研究的起点：先把流动性诊断和成本感知评估做好，再讨论复杂模型。
 
-## 5. Research Landscape
+## 3. What the Book Adds Beyond Price
 
-文献路线大致经历了 queueing model、Hawkes process、DeepLOB 和近期 benchmark。DeepLOB 之后，大家逐渐认识到仅仅提升分类指标是不够的，数据切分、标签定义、市场制度和交易成本都会显著影响结果。
+订单簿相比价格序列，多给了我们一个关键维度：队列。
 
-## 6. DeepLOB Baseline
+每一档 bid 和 ask 不只是价格，还有等待成交的数量。价格为什么会跳？本质上是 best bid 或 best ask 的队列被 market order 和 cancellation 消耗完，价格才移动到下一档。
 
-DeepLOB 是一个有代表性的基线。CNN 捕捉价格档位之间的局部结构，序列模块捕捉时间依赖。但我的建议是，内部研究不要一上来追复杂模型。先把标签、样本切分、交易成本和执行约束做对，再上深度模型。
+所以常见模型输入不是一根价格线，而是最近一段时间前 L 档订单簿的动态矩阵。一个简单但很有解释力的特征是 imbalance，也就是买方深度和卖方深度的相对差。
 
-## 7. From Prediction to Trading Signal
+这页的重点是：LOB 让我们看到价格变化前的压力结构。
 
-一个信号只有在预期收益超过 spread、fee、impact 和 delay risk 后才可交易。实际流程应该是：模型分数先过流动性过滤，再过执行成本过滤，再做 sizing，最后才决定 trade/no trade。
+## 4. Liquidity Is the Tradable State
 
-## 8. Internal Data Validation
+这一页是汇报里最重要的交易观点。
 
-内部数据要验证四件事：订单簿宽表是否干净，基础流动性指标是否稳定，未来收益标签是否无泄露，以及信号是否在扣除成本后仍然有效。这里的表格会由内网 Python 生成，当前是占位。
+一个信号能不能交易，要看预期价格变化是否大于 spread、fee、impact 和 delay risk。否则预测对了也可能亏钱。
 
-## 9. Internal Data Snapshot
+因此，流动性才是真正的可交易状态。Spread 代表立即交易摩擦；depth 和 impact 决定容量；resiliency 决定订单簿被冲击后恢复多快；slippage 则是线上执行的真实结果。
 
-这一页看内部样本的 mid、spread、depth 和 imbalance。真正汇报时，我会用内网数据替换占位图。重点不是图好看，而是要看到 spread 是否稳定、深度是否足够、imbalance 是否有结构性。
+对我们来说，LOB 研究的目标不是只提高分类准确率，而是找到在这些执行约束下仍然有效的信号。
 
-## 10. Signal Diagnostic
+## 5. What the Literature Suggests
 
-这一页看 imbalance 与未来收益的关系。如果散点没有方向、分桶均值不稳定，说明单独用 imbalance 不够。如果只在某些 regime 下有效，那它应该是条件信号，而不是全市场信号。
+文献可以压缩成四个层次。
 
-## 11. Workflow
+第一，queueing model 解释价格变化和队列消耗之间的关系。第二，Hawkes model 描述订单流的自激发和交叉激发。第三，DeepLOB 证明订单簿快照本身有短周期预测信息。第四，近年的 benchmark 研究提醒我们：不同数据集、不同 horizon、不同市场制度下，模型表现可能很脆弱。
 
-推荐工作流是先做特征库和简单 baseline，再做成本感知回测，最后再上 DeepLOB 或 Transformer。这样能避免模型复杂但交易不可用的问题。
+因此我的建议是：内部第一步不要直接追最复杂模型，而是先建立可靠、无泄露、成本感知的研究 pipeline。
 
-## 12. Roadmap and Ask
+## 6. Internal Data Diagnostics
 
-下一步需要确认优先标的、第一版执行假设和容量阈值。两周内可以完成数据质量检查、基础特征库、成本感知评估和第一版策略原型。
+这一页是给内网数据预留的。
+
+现在图是本机生成的 placeholder。真正汇报前，如果有内网数据，我们只需要在内网用 Python 生成同名 PNG 和指标片段，再带回本机编译。
+
+这里关注四个量：mid-price path、spread、cumulative depth、imbalance。目的是先判断样本是否干净、spread 是否稳定、深度是否足够、imbalance 是否有结构。
+
+如果这些基础状态都不稳定，那么直接训练深度模型意义不大。
+
+## 7. From Diagnostics to Signal
+
+这一页看 imbalance 和未来收益的关系。
+
+左边散点图看的是 imbalance 对未来 30 秒收益的解释力；右边分桶图看高低 imbalance 桶的平均未来收益。
+
+这里的判断标准很直接：如果 imbalance 和未来收益没有稳定关系，它就不是单独可交易信号。如果它只在低 spread、高 depth 的 regime 下有效，那它应该作为条件信号，而不是全市场信号。
+
+最终评价指标仍然应该是扣除执行成本后的 PnL，而不是分类准确率。
+
+## 8. Proposed Next Step
+
+最后是建议的工作计划。
+
+第一周做数据质量、特征库和 baseline diagnostics。第二周做成本感知回测、流动性过滤器和第一版策略原型。
+
+只有当简单 baseline 稳定之后，再上 DeepLOB 或 Transformer 才有意义。否则我们可能只是在拟合一个无法交易的预测任务。
+
+需要领导确认的三个问题是：优先做哪些标的和市场；第一版执行假设用主动、被动还是混合；以及最低容量阈值是多少，才能算有商业价值。
+
+最后一句话总结：先把 execution-aware pipeline 建起来，再加复杂模型。
 

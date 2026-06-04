@@ -1,14 +1,10 @@
 # LOB 5 页领导汇报讲稿
 
-## 1. Plan, Feasibility, and Key Risks
+## 1. Applications of LOB and Microstructure
 
-这一页直接回答领导最关心的两个问题：我们计划做什么，以及这件事是否可行。
+这一页只做封面，不展开内容。
 
-计划分两条线。第一条是把 LOB 信号接入当前 Algo Type1 主动点单，目标是提升成交质量、降低滑点和 market impact。第二条是把同样的 microstructure 信号扩展到部门级 internal flow，提高内部截单、内部成交和智能路由的利用效率。
-
-目前可行性上，研究路径已经明确，价值目标也已经按 0.01bp 成本节省校准为每年约 9000 万人民币。第一版不需要直接上复杂深度模型，可以从 spread、depth、imbalance、queue depletion、resiliency 这些可解释特征开始。
-
-风险主要有四个：第一是数据对齐，订单簿、订单、成交和 internal flow 的时间戳必须能对上；第二是标签不能有未来信息泄露；第三是 PnL 归因要干净，能区分方向、spread、impact 和 routing 的贡献；第四是信号要能跨市场状态稳定，不能只在某一段行情里有效。
+开场可以一句话带过：今天主要汇报 LOB 和 microstructure 在交易执行里的两个具体应用，一个是当前 Algo Type1 的 execution alpha，另一个是部门级 internal flow 的利用效率提升。
 
 ## 2. Algo Type1 Execution Alpha
 

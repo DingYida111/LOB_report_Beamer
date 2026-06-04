@@ -53,7 +53,7 @@
 }
 \newcommand{\source}[1]{{\vspace{0.10em}\tiny\color{BrandGray}Source: #1\par}}
 
-\title{Limit Order Book Execution Plan}
+\title{Applications of LOB and Microstructure}
 \subtitle{Algo Type1 Execution Alpha and Internal Flow Efficiency}
 \author{Yida Ding}
 \date{June 2026}
@@ -62,35 +62,12 @@
 \small
 
 \begin{frame}[plain]
-\contentheader{Plan, Feasibility, and Key Risks}
-\begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.48\textwidth}
-\begin{block}{Plan}
-\begin{itemize}\tightitems
-  \item \key{Algo Type1:} LOB-powered execution layer.
-  \item \key{Internal flow:} crossing, routing, and liquidity timing.
-  \item Value metrics: slippage, impact, fill quality, internalization.
-\end{itemize}
-\end{block}
-\begin{block}{Feasibility status}
-\begin{itemize}\tightitems
-  \item Research path and RMB 90mm base target are defined.
-  \item Prototype can start with interpretable LOB features.
-  \item Required data: book, order/fill, and internal flow timestamps.
-\end{itemize}
-\end{block}
-\end{column}
-\begin{column}{0.48\textwidth}
-\begin{block}{Key risks to manage}
-\begin{itemize}\tightitems
-  \item Data alignment across book, order, fill, and flow.
-  \item Leakage control in labels and backtests.
-  \item Cost attribution across direction, spread, impact, and routing.
-  \item Regime stability in volatile or low-liquidity periods.
-\end{itemize}
-\end{block}
-\end{column}
-\end{columns}
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[BrandOrange] (current page.south west) rectangle (current page.north east);
+  \node[align=center,text=white,font=\bfseries\fontsize{24}{29}\selectfont,text width=12.5cm] at ([yshift=0.85cm]current page.center) {Applications of LOB and Microstructure};
+  \node[align=center,text=white,font=\large] at ([yshift=-0.75cm]current page.center) {Algo Type1 Execution Alpha and Internal Flow Efficiency};
+  \node[align=center,text=white,font=\normalsize] at ([yshift=-1.55cm]current page.center) {Yida Ding \quad | \quad June 2026};
+\end{tikzpicture}
 \end{frame}
 
 \begin{frame}[plain]

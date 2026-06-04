@@ -1,0 +1,98 @@
+{
+  "output": "LOB_report_internal_template.pptx",
+  "meta": {
+    "author": "Yida Ding",
+    "title": "Liquidity-Aware Smart Execution",
+    "date": "June 2026"
+  },
+  "image_overlays": [],
+  "slides": {
+    "cover": {
+      "title": "Liquidity-Aware Smart Execution\nfor Desk Efficiency",
+      "subtitle": "Microstructure Signals Across Manual Trading and Peak Algo",
+      "byline": "Yida Ding | June 2026"
+    },
+    "desk_layer": {
+      "title": "Smart Execution as a Desk Efficiency Layer",
+      "trading_paths": ["Manual desk\nworkflow", "Peak Algo\nworkflow"],
+      "state_inputs": ["LOB state", "Flow / axes", "Fill history"],
+      "control": "Liquidity-aware\ndecision layer",
+      "levers": "Timing    FAK aggression\nInternal cross    Residual route",
+      "ledger": "Slippage + impact + internalization uplift\n-> attributed execution P&L"
+    },
+    "fak": {
+      "title": "FAK Order Execution Efficiency",
+      "pipeline": [
+        "LOB features\nspread, depth, imbalance, resiliency",
+        "Direction / liquidity-regime signal",
+        "Real-time fill probability\nAlgo state and queue position",
+        "FAK order decision\ntiming, level, aggressiveness"
+      ],
+      "output": "Execution efficiency\nFill quality\nCost control",
+      "case_1_title": "Case 1: favorable direction",
+      "case_1": [
+        "Direction supports the order side.",
+        "Expected fill probability is higher.",
+        "Execution efficiency: lower slippage and lower market impact."
+      ],
+      "case_2_title": "Case 2: adverse direction",
+      "case_2": [
+        "Direction works against the FAK order.",
+        "Revise fill expectation and aggressiveness.",
+        "Improve success rate and reduce unhedged risk."
+      ]
+    },
+    "liquidity_state": {
+      "title": "Liquidity is the True State Variable",
+      "vector": "L_t = {cost, capacity, immediacy, resiliency,\ntoxicity, internal fit}",
+      "state_rules": [
+        "High capacity + fast resiliency: raise FAK confidence.",
+        "High cost or toxicity: revise fill expectation and aggression.",
+        "High internal fit: cross internally before external routing.",
+        "Weak state: delay, slice smaller, or hedge earlier."
+      ],
+      "design_rule": "Price is the observation. Liquidity is the control state.",
+      "source": "Source: Lehalle and Laruelle; Cont and de Larrard; Bacry et al.; LOBFrame / LOB benchmark studies."
+    },
+    "internal_flow": {
+      "title": "Internal Flow: Fit Before Route",
+      "matrix_labels": {
+        "x": "External liquidity state",
+        "y": "Internal fit",
+        "top_left": "Warehouse / wait\navoid toxic route",
+        "top_right": "Cross internally\nthen hedge residual",
+        "bottom_left": "Hold smaller\nseek flow",
+        "bottom_right": "Route externally\nlow residual cost"
+      },
+      "fit_inputs": [
+        "Orders, RFQ, axes and inventory.",
+        "Side, tenor, size and urgency.",
+        "Liquidity cost, capacity and toxicity."
+      ],
+      "principles": [
+        "Internalize when fit is high.",
+        "Route only the measured residual.",
+        "Prove uplift vs. external cost."
+      ]
+    },
+    "pnl": {
+      "title": "0.01 bp Execution P&L: Attribution Plan",
+      "target_title": "Annual efficiency target",
+      "target_value": "90M",
+      "target_subtitle": "annual target from 0.01 bp saving",
+      "formula_items": [
+        "2025 flow: 45tn.",
+        "Average duration: 2 years.",
+        "45tn x 2 x 0.01bp ~= 90M."
+      ],
+      "rollout": ["Replay", "Shadow", "Pilot", "Scale"],
+      "attribution_title": "Where the 0.01 bp comes from",
+      "attribution": [
+        ["Internal crossing", "avoid spread + external impact"],
+        ["Liquidity timing", "depth + resiliency windows"],
+        ["Toxicity control", "hedge leakage + bad fills"]
+      ],
+      "ledger": "Attribution ledger: slippage,\nimpact, internalization uplift"
+    }
+  }
+}

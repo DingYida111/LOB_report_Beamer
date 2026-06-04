@@ -74,27 +74,25 @@
 \contentheader{Smart Execution as a Desk Efficiency Layer}
 \begin{center}
 \begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (manual) at (1.7,3.55) {Manual trading\\platform workflow};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (peak) at (1.7,1.95) {Quant trading\\Peak Algo};
+  \node[font=\scriptsize\bfseries,BrandBlue] at (1.55,4.55) {Trading paths};
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=2.75cm,align=center,inner sep=5pt] (manual) at (1.55,3.55) {Manual desk\\workflow};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=2.75cm,align=center,inner sep=5pt] (peak) at (1.55,2.15) {Peak Algo\\workflow};
 
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.8cm,align=center,inner sep=6pt,font=\scriptsize\bfseries] (smart) at (6.15,2.85) {Smart Execution Layer};
-  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (micro) at (6.15,4.55) {Microstructure\\spread, depth, imbalance};
-  \node[draw=BrandPurple,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (flow) at (4.75,1.25) {Flow and inventory\\RFQ, axes};
-  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (hist) at (7.55,1.25) {Execution history\\fills, slippage, impact};
+  \node[font=\scriptsize\bfseries,BrandOrangeDark] at (5.65,4.55) {Smart execution control};
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,line width=1pt,text width=3.35cm,align=center,inner sep=7pt,font=\scriptsize\bfseries] (smart) at (5.65,2.85) {Liquidity-aware\\decision layer};
+  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.62cm,align=center,inner sep=4pt] (micro) at (5.65,4.00) {LOB state};
+  \node[draw=BrandPurple,fill=white,rounded corners=2pt,text width=2.62cm,align=center,inner sep=4pt] (flow) at (4.05,1.38) {Flow / axes};
+  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=2.62cm,align=center,inner sep=4pt] (hist) at (7.25,1.38) {Fill history};
 
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.45cm,align=center,inner sep=5pt] (decision) at (10.9,3.55) {Order actions\\timing, aggression, routing};
-  \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (eff) at (10.9,1.75) {Desk efficiency\\slippage, impact, internalization};
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (pnl) at (10.9,0.35) {Attributed P\&L\\feedback loop};
+  \node[font=\scriptsize\bfseries,BrandGreen] at (10.25,4.55) {Efficiency levers};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=4.85cm,align=center,inner sep=7pt,font=\scriptsize\bfseries] (levers) at (10.35,2.85) {Timing \quad FAK aggression\\[0.20em]Internal cross \quad Residual route};
+  \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=4.95cm,align=center,inner sep=4pt,font=\scriptsize\bfseries] (ledger) at (10.35,0.62) {Slippage + impact + internalization uplift\\\(\rightarrow\) attributed execution P\&L};
 
   \foreach \s in {manual,peak}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\s.east) -- (smart.west);}
   \foreach \s in {micro,flow,hist}{\draw[-{Stealth[length=2mm]},BrandGray,thick] (\s) -- (smart);}
-  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (smart.east) -- (decision.west);
-  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (decision.south) -- (eff.north);
-  \draw[-{Stealth[length=2mm]},BrandGray,thick] (eff.south) -- (pnl.north);
-
-  \node[font=\scriptsize\bfseries,BrandBlue] at (1.7,4.75) {Current desk};
-  \node[font=\scriptsize\bfseries,BrandOrangeDark] at (6.15,5.15) {Signal fusion};
-  \node[font=\scriptsize\bfseries,BrandGreen] at (10.9,4.75) {Efficiency output};
+  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (smart.east) -- (levers.west);
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (levers.south) -- (ledger.north);
+  \draw[-{Stealth[length=2mm]},BrandGray,thick,dashed] (ledger.west) .. controls (6.8,0.05) and (4.4,0.35) .. (smart.south);
 \end{tikzpicture}
 \end{center}
 \end{frame}
@@ -177,33 +175,48 @@
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Microstructure for Internal Flow}
+\contentheader{Internal Flow: Fit Before Route}
 \begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.56\textwidth}
+\begin{column}{0.58\textwidth}
 \begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=2.75cm,align=center,inner sep=4pt] (orders) at (1.55,3.35) {Orders + flow\\inventory, RFQ, axes};
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=2.75cm,align=center,inner sep=4pt] (liq) at (1.55,1.55) {Liquidity state\\cost, capacity};
+  \draw[->,BrandGray,thick] (0.75,0.70) -- (6.90,0.70);
+  \draw[->,BrandGray,thick] (0.75,0.70) -- (0.75,4.25);
+  \node[BrandGray,align=center] at (3.82,0.28) {External liquidity state};
+  \node[BrandGray,rotate=90,align=center] at (0.20,2.48) {Internal fit};
+  \node[BrandGray] at (1.15,0.35) {weak};
+  \node[BrandGray] at (6.43,0.35) {strong};
+  \node[BrandGray] at (0.32,1.05) {low};
+  \node[BrandGray] at (0.30,3.92) {high};
 
-  \node[draw=BrandOrange,fill=white,rounded corners=2pt,line width=1pt,text width=2.30cm,align=center,inner sep=5pt,font=\scriptsize\bfseries] (fit) at (4.25,2.45) {Internal fit score};
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=2.15cm,align=center,inner sep=4pt] (cross) at (6.40,3.35) {Internal\\crossing};
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=2.15cm,align=center,inner sep=4pt] (route) at (6.40,1.55) {Residual\\routing};
-  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.30cm,align=center,inner sep=4pt] (metric) at (6.40,0.35) {Uplift vs.\\residual cost};
+  \fill[BrandPurpleLight] (0.95,0.95) rectangle (3.75,2.42);
+  \fill[BrandBlueLight] (3.95,0.95) rectangle (6.75,2.42);
+  \fill[BrandOrangeLight] (0.95,2.62) rectangle (3.75,4.08);
+  \fill[BrandGreenLight] (3.95,2.62) rectangle (6.75,4.08);
+  \draw[BrandGray!60] (0.95,0.95) rectangle (6.75,4.08);
+  \draw[BrandGray!60] (3.85,0.95) -- (3.85,4.08);
+  \draw[BrandGray!60] (0.95,2.52) -- (6.75,2.52);
 
-  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (orders.east) -- (fit.160);
-  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (liq.east) -- (fit.200);
-  \draw[-{Stealth[length=2mm]},BrandGreen,thick] (fit.25) -- (cross.west);
-  \draw[-{Stealth[length=2mm]},BrandGray,thick] (fit.-25) -- (route.west);
-  \draw[-{Stealth[length=2mm]},BrandBlue,thick] (cross.south) -- (metric.north);
-  \draw[-{Stealth[length=2mm]},BrandBlue,thick] (route.south) -- (metric.north);
+  \node[align=center,font=\scriptsize\bfseries,text width=2.25cm] at (2.35,3.35) {Warehouse / wait\\avoid toxic route};
+  \node[align=center,font=\scriptsize\bfseries,text width=2.25cm] at (5.35,3.35) {Cross internally\\then hedge residual};
+  \node[align=center,font=\scriptsize\bfseries,text width=2.25cm] at (2.35,1.68) {Hold smaller\\seek flow};
+  \node[align=center,font=\scriptsize\bfseries,text width=2.25cm] at (5.35,1.68) {Route externally\\low residual cost};
+
+  \node[draw=BrandOrange,fill=white,rounded corners=2pt,line width=1pt,text width=2.75cm,align=center,inner sep=4pt,font=\scriptsize\bfseries] at (3.85,4.63) {Policy map from\\internal fit score};
 \end{tikzpicture}
 \end{column}
-\begin{column}{0.40\textwidth}
-\begin{block}{Research-backed decision}
+\begin{column}{0.38\textwidth}
+\begin{block}{Fit score inputs}
 \begin{itemize}\tightitems
-  \item Price external liquidity by state, not quote alone.
-  \item Estimate internal fit from inventory, RFQ and axes.
-  \item Route residual flow when depth and resiliency are favorable.
-  \item Prove uplift against residual external cost.
+  \item Orders, RFQ, axes and inventory.
+  \item Side, tenor, size and urgency.
+  \item Liquidity cost, capacity and toxicity.
+\end{itemize}
+\end{block}
+\begin{block}{Decision principle}
+\begin{itemize}\tightitems
+  \item Internalize when fit is high.
+  \item Route only the measured residual.
+  \item Prove uplift vs. external cost.
 \end{itemize}
 \end{block}
 \end{column}
@@ -211,9 +224,9 @@
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{0.01 bp as Attributed Execution P\&L}
+\contentheader{0.01 bp Execution P\&L: Attribution Plan}
 \begin{columns}[T,totalwidth=\textwidth]
-\begin{column}{0.45\textwidth}
+\begin{column}{0.43\textwidth}
 \begin{block}{Annual efficiency target}
 \begin{center}
 {\fontsize{24}{28}\selectfont\bfseries\color{BrandOrangeDark}90M}\\
@@ -226,22 +239,24 @@
   \item Average duration: 2 years.
   \item \(45tn \times 2 \times 0.01bp \approx 90M\).
 \end{itemize}
+\vspace{0.25em}
+\begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=1.18cm,align=center,inner sep=3pt] (a) at (0.65,0.55) {Replay};
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=1.18cm,align=center,inner sep=3pt] (b) at (2.05,0.55) {Shadow};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=1.18cm,align=center,inner sep=3pt] (c) at (3.45,0.55) {Pilot};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=1.18cm,align=center,inner sep=3pt] (d) at (4.85,0.55) {Scale};
+  \foreach \i/\j in {a/b,b/c,c/d}{\draw[-{Stealth[length=1.6mm]},BrandGray,thick] (\i.east)--(\j.west);}
+\end{tikzpicture}
 \end{column}
-\begin{column}{0.51\textwidth}
-\begin{block}{Attribution stack}
-\begin{itemize}\tightitems
-  \item \key{Internal crossing:} avoid spread and external market impact.
-  \item \key{Liquidity timing:} trade when depth and resiliency are favorable.
-  \item \key{Adverse-selection control:} reduce hedge leakage and bad fills.
-\end{itemize}
-\end{block}
-\begin{block}{Proof metrics}
-\begin{itemize}\tightitems
-  \item Slippage vs. arrival / decision price.
-  \item Post-trade impact and hedge delay.
-  \item Internalization uplift vs. residual external cost.
-\end{itemize}
-\end{block}
+\begin{column}{0.53\textwidth}
+\begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=5.85cm,align=left,inner sep=5pt] (cross) at (3.05,4.10) {\key{Internal crossing}\hfill avoid spread + external impact};
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=5.85cm,align=left,inner sep=5pt] (timing) at (3.05,3.10) {\key{Liquidity timing}\hfill depth + resiliency windows};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=5.85cm,align=left,inner sep=5pt] (tox) at (3.05,2.10) {\key{Toxicity control}\hfill hedge leakage + bad fills};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=5.85cm,align=center,inner sep=5pt,font=\scriptsize\bfseries] (proof) at (3.05,0.82) {Attribution ledger: slippage, impact, internalization uplift};
+  \foreach \s in {cross,timing,tox}{\draw[-{Stealth[length=2mm]},BrandGray,thick] (\s.south) -- (proof.north);}
+  \node[BrandGray,align=center] at (3.05,4.82) {Where the 0.01 bp comes from};
+\end{tikzpicture}
 \end{column}
 \end{columns}
 \end{frame}

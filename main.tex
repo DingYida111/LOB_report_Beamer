@@ -53,8 +53,8 @@
 }
 \newcommand{\source}[1]{{\vspace{0.10em}\tiny\color{BrandGray}Source: #1\par}}
 
-\title{Applications of LOB and Microstructure}
-\subtitle{Algo Type1 Execution Alpha and Internal Flow Efficiency}
+\title{Liquidity-Aware Smart Execution}
+\subtitle{Microstructure Signals for FICC Desk Efficiency}
 \author{Yida Ding}
 \date{June 2026}
 
@@ -64,10 +64,40 @@
 \begin{frame}[plain]
 \begin{tikzpicture}[remember picture,overlay]
   \fill[BrandOrange] (current page.south west) rectangle (current page.north east);
-  \node[align=center,text=white,font=\bfseries\fontsize{24}{29}\selectfont,text width=12.5cm] at ([yshift=0.85cm]current page.center) {Applications of LOB and Microstructure};
-  \node[align=center,text=white,font=\large] at ([yshift=-0.75cm]current page.center) {Algo Type1 Execution Alpha and Internal Flow Efficiency};
+  \node[align=center,text=white,font=\bfseries\fontsize{23}{28}\selectfont,text width=12.7cm] at ([yshift=0.85cm]current page.center) {Liquidity-Aware Smart Execution\\for Desk Efficiency};
+  \node[align=center,text=white,font=\large] at ([yshift=-0.75cm]current page.center) {Microstructure Signals Across Manual Trading and Peak Algo};
   \node[align=center,text=white,font=\normalsize] at ([yshift=-1.55cm]current page.center) {Yida Ding \quad | \quad June 2026};
 \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[plain]
+\contentheader{Smart Execution as a Desk Efficiency Layer}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (manual) at (1.7,3.7) {Subjective traders\\manual platform trading};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (peak) at (1.7,2.25) {Quant traders\\Peak Algo instances};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (scope) at (1.7,0.85) {FICC coverage\\strategies, frequencies, instruments};
+
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.8cm,align=center,inner sep=6pt,font=\scriptsize\bfseries] (smart) at (6.15,2.85) {Smart Execution Layer};
+  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (micro) at (6.15,4.55) {LOB / microstructure\\spread, depth, imbalance};
+  \node[draw=BrandPurple,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (flow) at (4.75,1.25) {Flow and inventory\\RFQ, axes, internal demand};
+  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (hist) at (7.55,1.25) {Order and fill history\\fill rate, slippage, impact};
+
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.45cm,align=center,inner sep=5pt] (decision) at (10.9,3.55) {Execution decisions\\timing, aggression, routing};
+  \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (eff) at (10.9,1.75) {Desk efficiency\\lower slippage, lower impact, higher internalization};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (pnl) at (10.9,0.35) {Measurable P\&L\\cost attribution and feedback};
+
+  \foreach \s in {manual,peak,scope}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\s.east) -- (smart.west);}
+  \foreach \s in {micro,flow,hist}{\draw[-{Stealth[length=2mm]},BrandGray,thick] (\s) -- (smart);}
+  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (smart.east) -- (decision.west);
+  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (decision.south) -- (eff.north);
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (eff.south) -- (pnl.north);
+
+  \node[font=\scriptsize\bfseries,BrandBlue] at (1.7,4.75) {Current desk};
+  \node[font=\scriptsize\bfseries,BrandOrangeDark] at (6.15,5.15) {Signal fusion};
+  \node[font=\scriptsize\bfseries,BrandGreen] at (10.9,4.75) {Efficiency output};
+\end{tikzpicture}
+\end{center}
 \end{frame}
 
 \begin{frame}[plain]

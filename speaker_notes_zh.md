@@ -1,12 +1,22 @@
-# LOB 5 页领导汇报讲稿
+# Smart Execution 6 页领导汇报讲稿
 
-## 1. Applications of LOB and Microstructure
+## 1. Liquidity-Aware Smart Execution for Desk Efficiency
 
 这一页只做封面，不展开内容。
 
-开场可以一句话带过：今天主要汇报 LOB 和 microstructure 在交易执行里的两个具体应用，一个是当前 Algo Type1 的 execution alpha，另一个是部门级 internal flow 的利用效率提升。
+开场可以一句话带过：今天主要汇报如何用 LOB、microstructure 和 liquidity signals 构建 Smart Execution，提升整个 FICC desk 的执行效率。
 
-## 2. Algo Type1 Execution Alpha
+## 2. Smart Execution as a Desk Efficiency Layer
+
+这一页用一张图说明 Smart Execution 在整个 desk 里的位置。
+
+现在 desk 主要有两条交易路径。第一条是主观交易员在交易平台上手工交易，第二条是量化交易员通过 Peak Algo 这样的算法交易实例进行量化交易。覆盖的品种是 FICC，策略和频率都很多，从相对低频的组合调整，到更高频的算法执行都有。
+
+Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两条路径之间增加一层执行智能。它把三类信息融合起来：第一是 LOB 和 microstructure 信息，比如 spread、depth、imbalance；第二是 flow 和库存信息，比如 RFQ、axes、internal demand；第三是历史订单和成交信息，比如 fill rate、slippage 和 market impact。
+
+这层智能输出的是执行决策：什么时候交易、多激进、走内部匹配还是外部路由、如何反馈成本归因。效率收益来自更低滑点、更低冲击成本、更高内部化率，以及可衡量的 PnL attribution。
+
+## 3. Algo Type1 Execution Alpha
 
 这一页讲第一条主线：Algo Type1 execution alpha。
 
@@ -18,7 +28,7 @@
 
 第二个场景是市场方向不利。比如我们要买，但 LOB 方向和成交概率都不支持，这时不应该盲目维持原来的 Type1 预期，而应该修正成交预期和激进程度。这样可以提高交易成功率，同时减少没有及时 hedge 带来的 unhedged risk。
 
-## 3. Algo Plan and Literature Support
+## 4. Algo Plan and Literature Support
 
 这一页继续讲 Algo Type1，但重点放在计划和理论佐证。
 
@@ -34,9 +44,9 @@
 
 所以我们的策略是先做可解释、成本感知的 baseline，再决定是否上 DeepLOB 或 Transformer。
 
-## 4. Microstructure for Internal Flow
+## 5. Microstructure for Internal Flow
 
-第四页讲第二条主线：microstructure 如何提升 internal flow 利用效率。
+这一页讲第二条主线：microstructure 如何提升 internal flow 利用效率。
 
 如果只看单笔订单，LOB 信号解决的是执行时点和点单方式。但从部门层面看，我们可以把客户订单、desk orders、RFQ、库存、axes 和历史成交整合成 internal flow map。
 
@@ -44,7 +54,7 @@
 
 这页要强调，microstructure 不是单独做一个模型，而是提升 internal flow 利用效率的一层执行智能：什么时候内部化，什么时候外部化，外部化时怎么减少成本。
 
-## 5. How We Save 0.01 bp Per Trade
+## 6. How We Save 0.01 bp Per Trade
 
 最后一页讲 0.01bp 是怎么省出来的，以及如何证明。
 

@@ -10,27 +10,27 @@
 
 这一页用一张图说明 Smart Execution 在整个 desk 里的位置。
 
-现在 desk 主要有两条交易路径。第一条是主观交易员在交易平台上手工交易，第二条是量化交易员通过 Peak Algo 这样的算法交易实例进行量化交易。覆盖的品种是 FICC，策略和频率都很多，从相对低频的组合调整，到更高频的算法执行都有。
+现在 desk 主要有两条交易路径。第一条是主观交易员在交易平台上手工交易，第二条是量化交易员通过 Peak Algo 进行量化交易。覆盖的品种是 FICC，策略和频率都很多，从相对低频的组合调整，到更高频的算法执行都有。
 
 Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两条路径之间增加一层执行智能。它把三类信息融合起来：第一是 LOB 和 microstructure 信息，比如 spread、depth、imbalance；第二是 flow 和库存信息，比如 RFQ、axes、internal demand；第三是历史订单和成交信息，比如 fill rate、slippage 和 market impact。
 
-这层智能输出的是执行决策：什么时候交易、多激进、走内部匹配还是外部路由、如何反馈成本归因。效率收益来自更低滑点、更低冲击成本、更高内部化率，以及可衡量的 PnL attribution。
+这层智能输出的是更简洁的 order actions：什么时候交易、多激进、走内部匹配还是外部路由、如何反馈成本归因。效率收益来自更低滑点、更低冲击成本、更高内部化率，以及可衡量的 PnL attribution。
 
-## 3. Algo Type1 Execution Alpha
+## 3. FAK Order Execution Alpha
 
-这一页讲第一条主线：Algo Type1 execution alpha。
+这一页讲第一条主线：FAK order execution alpha。
 
-流程上，LOB 特征先生成 15 到 130 分钟的市场方向信号，再和 Algo 当前的实时成交概率结合，包括当前队列位置、剩余量、盘口深度和历史成交行为。最终输出不是简单买卖信号，而是 Type1 主动点单的执行决策：什么时候点、点在哪一档、要多激进。
+流程上，LOB 特征先生成 15 到 130 分钟的方向和 liquidity regime 信号，再和 Algo 当前的实时成交概率结合，包括当前队列位置、剩余量、盘口深度和历史成交行为。这里要注意，15 到 130 分钟更适合作为执行规划和流动性状态更新频率，不应被讲成 raw LOB 对这个 horizon 的直接价格预测。最终输出不是简单买卖信号，而是 FAK order 的执行决策：什么时候点、点在哪一档、要多激进。
 
 这里要讲清楚两个场景。
 
-第一个场景是市场方向有利。比如我们要买，LOB 信号显示后续市场方向也偏上，成交概率更高，这时主动点单更容易产生 execution alpha，体现为更低滑点、更低 market impact。
+第一个场景是市场方向有利。比如我们要买，LOB 信号显示后续市场方向也偏上，成交概率更高，这时 FAK order 更容易产生 execution alpha，体现为更低滑点、更低 market impact。
 
-第二个场景是市场方向不利。比如我们要买，但 LOB 方向和成交概率都不支持，这时不应该盲目维持原来的 Type1 预期，而应该修正成交预期和激进程度。这样可以提高交易成功率，同时减少没有及时 hedge 带来的 unhedged risk。
+第二个场景是市场方向不利。比如我们要买，但 LOB 方向和成交概率都不支持，这时不应该盲目维持原来的 FAK order 预期，而应该修正成交预期和激进程度。这样可以提高交易成功率，同时减少没有及时 hedge 带来的 unhedged risk。
 
 ## 4. Algo Plan and Literature Support
 
-这一页继续讲 Algo Type1，但重点放在计划和理论佐证。
+这一页继续讲 FAK orders，但重点放在计划和理论佐证。
 
 实施计划上，第一步是按 15、30、60、90、130 分钟不同 horizon 建 LOB 特征流和方向标签。第二步先做透明特征，包括 spread、depth、imbalance、queue depletion 和 resiliency。第三步把方向信号接入 Algo 成交概率引擎。第四步先 shadow trading，再做小范围 A/B test。
 

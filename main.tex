@@ -74,18 +74,18 @@
 \contentheader{Smart Execution as a Desk Efficiency Layer}
 \begin{center}
 \begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (manual) at (1.7,3.7) {Subjective traders\\manual platform trading};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (peak) at (1.7,2.25) {Quant traders\\Peak Algo instances};
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (scope) at (1.7,0.85) {FICC coverage\\strategies, frequencies, instruments};
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (manual) at (1.7,3.7) {Manual trading\\platform workflow};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (peak) at (1.7,2.25) {Quant trading\\Peak Algo};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.1cm,align=center,inner sep=5pt] (scope) at (1.7,0.85) {FICC desk\\products and frequencies};
 
   \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.8cm,align=center,inner sep=6pt,font=\scriptsize\bfseries] (smart) at (6.15,2.85) {Smart Execution Layer};
-  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (micro) at (6.15,4.55) {LOB / microstructure\\spread, depth, imbalance};
-  \node[draw=BrandPurple,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (flow) at (4.75,1.25) {Flow and inventory\\RFQ, axes, internal demand};
-  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (hist) at (7.55,1.25) {Order and fill history\\fill rate, slippage, impact};
+  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (micro) at (6.15,4.55) {Microstructure\\spread, depth, imbalance};
+  \node[draw=BrandPurple,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (flow) at (4.75,1.25) {Flow and inventory\\RFQ, axes};
+  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=2.85cm,align=center,inner sep=4pt] (hist) at (7.55,1.25) {Execution history\\fills, slippage, impact};
 
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.45cm,align=center,inner sep=5pt] (decision) at (10.9,3.55) {Execution decisions\\timing, aggression, routing};
-  \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (eff) at (10.9,1.75) {Desk efficiency\\lower slippage, lower impact, higher internalization};
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (pnl) at (10.9,0.35) {Measurable P\&L\\cost attribution and feedback};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.45cm,align=center,inner sep=5pt] (decision) at (10.9,3.55) {Order actions\\timing, aggression, routing};
+  \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (eff) at (10.9,1.75) {Desk efficiency\\slippage, impact, internalization};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.25cm,align=center,inner sep=5pt] (pnl) at (10.9,0.35) {Attributed P\&L\\feedback loop};
 
   \foreach \s in {manual,peak,scope}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\s.east) -- (smart.west);}
   \foreach \s in {micro,flow,hist}{\draw[-{Stealth[length=2mm]},BrandGray,thick] (\s) -- (smart);}
@@ -101,14 +101,14 @@
 \end{frame}
 
 \begin{frame}[plain]
-\contentheader{Algo Type1 Execution Alpha}
+\contentheader{FAK Order Execution Alpha}
 \begin{columns}[T,totalwidth=\textwidth]
 \begin{column}{0.54\textwidth}
 \begin{tikzpicture}[node distance=0.36cm,every node/.style={font=\scriptsize}]
   \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt] (lob) {LOB features\\spread, depth, imbalance, resiliency};
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of lob] (sig) {15--130 min market-direction signal};
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of lob] (sig) {15--130 min direction / liquidity-regime signal};
   \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of sig] (prob) {Real-time fill probability\\Algo state and queue position};
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of prob] (act) {Type1 active order decision\\timing, level, aggressiveness};
+  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of prob] (act) {FAK order decision\\timing, level, aggressiveness};
   \foreach \i/\j in {lob/sig,sig/prob,prob/act}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
   \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=2.70cm,align=center,inner sep=4pt,right=0.18cm of prob] (out) {Execution alpha\\Fill quality\\Risk control};
   \draw[-{Stealth[length=2mm]},BrandGray,thick] (act.east) -- ++(0.18,0) |- (out.south);
@@ -124,7 +124,7 @@
 \end{block}
 \begin{block}{Case 2: adverse direction}
 \begin{itemize}\tightitems
-  \item Direction works against the Type1 order.
+  \item Direction works against the FAK order.
   \item Revise fill expectation and aggressiveness.
   \item Improve success rate and reduce unhedged risk.
 \end{itemize}

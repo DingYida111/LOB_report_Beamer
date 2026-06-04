@@ -20,7 +20,7 @@ Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两
 
 这一页讲第一条主线：FAK order execution alpha。
 
-流程上，LOB 特征先生成 15 到 130 分钟的方向和 liquidity regime 信号，再和 Algo 当前的实时成交概率结合，包括当前队列位置、剩余量、盘口深度和历史成交行为。这里要注意，15 到 130 分钟更适合作为执行规划和流动性状态更新频率，不应被讲成 raw LOB 对这个 horizon 的直接价格预测。最终输出不是简单买卖信号，而是 FAK order 的执行决策：什么时候点、点在哪一档、要多激进。
+流程上，LOB 特征先生成 direction 和 liquidity regime 信号，再和 Algo 当前的实时成交概率结合，包括当前队列位置、剩余量、盘口深度和历史成交行为。这里不要在图上强调 15 到 130 分钟，因为它容易被误解成 raw LOB 对这个 horizon 的直接价格预测。更准确的讲法是：这些信号按执行窗口和流动性状态更新，最终输出不是简单买卖信号，而是 FAK order 的执行决策：什么时候点、点在哪一档、要多激进。
 
 这里要讲清楚两个场景。
 
@@ -32,7 +32,7 @@ Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两
 
 这一页继续讲 FAK orders，但重点放在计划和理论佐证。
 
-实施计划上，第一步是按 15、30、60、90、130 分钟不同 horizon 建 LOB 特征流和方向标签。第二步先做透明特征，包括 spread、depth、imbalance、queue depletion 和 resiliency。第三步把方向信号接入 Algo 成交概率引擎。第四步先 shadow trading，再做小范围 A/B test。
+实施计划上，第一步是按 execution horizon 和 liquidity regime 建 LOB 特征流和方向标签。内部实验可以保留 15、30、60、90、130 分钟这些 bucket，但不建议直接写在图上。第二步先做透明特征，包括 spread、depth、imbalance、queue depletion 和 resiliency。第三步把方向信号接入 Algo 成交概率引擎。第四步先 shadow trading，再做小范围 A/B test。
 
 文献上可以用三类研究来支撑。
 

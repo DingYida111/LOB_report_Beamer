@@ -105,7 +105,7 @@
 \begin{column}{0.54\textwidth}
 \begin{tikzpicture}[node distance=0.36cm,every node/.style={font=\scriptsize}]
   \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt] (lob) {LOB features\\spread, depth, imbalance, resiliency};
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of lob] (sig) {15--130 min direction / liquidity-regime signal};
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of lob] (sig) {Direction / liquidity-regime signal};
   \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of sig] (prob) {Real-time fill probability\\Algo state and queue position};
   \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.78cm,align=center,inner sep=4pt,below=of prob] (act) {FAK order decision\\timing, level, aggressiveness};
   \foreach \i/\j in {lob/sig,sig/prob,prob/act}{\draw[-{Stealth[length=2mm]},BrandOrange,thick] (\i)--(\j);}
@@ -138,7 +138,7 @@
 \begin{column}{0.48\textwidth}
 \begin{block}{Implementation plan}
 \begin{enumerate}
-  \item Build LOB feature stream by horizon: 15, 30, 60, 90, 130 minutes.
+  \item Build LOB feature stream by execution horizon and liquidity regime.
   \item Start with transparent features: spread, depth, imbalance, queue depletion, resiliency.
   \item Join direction signal with Algo fill-probability engine.
   \item Run shadow trading, then controlled A/B test.

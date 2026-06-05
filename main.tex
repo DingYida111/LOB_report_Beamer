@@ -74,29 +74,44 @@
 \contentheader{FAK Order Execution in PEAK Algo}
 \begin{center}
 \begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=2.35cm,align=center,inner sep=4pt,font=\scriptsize\bfseries] (peak) at (1.55,4.10) {PEAK Algo\\parent order};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=2.35cm,align=center,inner sep=4pt] (state) at (1.55,3.10) {Algo state\\queue, residual risk};
+  \draw[BrandBlue,line width=1.1pt,rounded corners=5pt] (0.35,0.25) rectangle (12.65,5.08);
+  \node[fill=white,inner sep=2pt,font=\scriptsize\bfseries,text=BrandBlue] at (6.50,5.08) {PEAK Algo: FAK execution engine};
 
-  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.25cm,align=center,inner sep=4pt] (lob) at (4.25,4.75) {LOB liquidity\\spread, depth};
-  \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=2.25cm,align=center,inner sep=4pt] (move) at (4.25,3.85) {Market-move\\signal};
-  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=2.25cm,align=center,inner sep=4pt] (fill) at (4.25,2.95) {Fill / cost\\model};
+  \node[BrandGray,font=\tiny\bfseries] at (1.82,4.52) {PEAK context};
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=2.35cm,align=center,inner sep=4pt,font=\scriptsize\bfseries] (parent) at (1.82,4.00) {Parent order\\FAK instruction};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=2.35cm,align=center,inner sep=4pt] (risk) at (1.82,3.10) {Queue state\\residual risk};
 
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,line width=1pt,text width=2.75cm,align=center,inner sep=6pt,font=\scriptsize\bfseries] (overlay) at (7.10,3.85) {Execution strategy\\overlay};
-  \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=3.35cm,align=center,inner sep=5pt,font=\scriptsize\bfseries] (policy) at (10.80,3.85) {PEAK controls\\FAK timing, level, aggression\\retry and hedge timing};
-  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=5.20cm,align=center,inner sep=4pt,font=\scriptsize\bfseries] (out) at (8.95,2.10) {Execution efficiency: fill quality, slippage, market impact, unhedged risk};
+  \node[BrandGray,font=\tiny\bfseries] at (5.05,4.52) {New strategy components};
+  \node[draw=BrandBlue,fill=white,rounded corners=2pt,text width=2.25cm,align=center,inner sep=4pt] (lob) at (5.05,4.00) {LOB liquidity\\depth, resiliency};
+  \node[draw=BrandOrange,fill=white,rounded corners=2pt,text width=2.25cm,align=center,inner sep=4pt] (move) at (5.05,3.10) {Market-move\\signal};
+  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=2.25cm,align=center,inner sep=4pt] (fill) at (5.05,2.20) {Fill / cost\\model};
 
-  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (peak.east) -- (overlay.west);
-  \draw[-{Stealth[length=2mm]},BrandGray,thick] (state.east) -- (overlay.west);
-  \foreach \s in {lob,move,fill}{\draw[-{Stealth[length=2mm]},BrandGray,thick] (\s.east) -- (overlay.west);}
-  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (overlay.east) -- (policy.west);
-  \draw[-{Stealth[length=2mm]},BrandGray,thick] (policy.south) -- (out.north);
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,line width=1pt,text width=2.55cm,align=center,inner sep=6pt,font=\scriptsize\bfseries] (overlay) at (7.85,3.10) {Execution strategy\\overlay};
 
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=5.55cm,align=left,inner sep=5pt] (casea) at (3.25,0.70) {
+  \node[BrandGray,font=\tiny\bfseries] at (10.82,4.52) {PEAK control updates};
+  \draw[BrandGreen,line width=0.8pt,rounded corners=3pt,fill=BrandGreenLight!35] (9.20,2.72) rectangle (12.45,4.30);
+  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=1.32cm,align=center,inner sep=4pt] (timing) at (10.02,3.92) {FAK\\timing};
+  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=1.32cm,align=center,inner sep=4pt] (level) at (11.62,3.92) {Price\\level};
+  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=1.32cm,align=center,inner sep=4pt] (agg) at (10.02,3.18) {Aggression\\retry};
+  \node[draw=BrandGreen,fill=white,rounded corners=2pt,text width=1.32cm,align=center,inner sep=4pt] (hedge) at (11.62,3.18) {Hedge\\timing};
+  \node[draw=BrandGray,fill=white,rounded corners=2pt,text width=3.80cm,align=center,inner sep=4pt,font=\scriptsize\bfseries] (eff) at (10.82,2.08) {Efficiency: fill quality, slippage, impact, unhedged risk};
+
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (parent.east) -- (lob.west);
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (risk.east) -- (move.west);
+  \draw[BrandGray,thick] (6.33,2.18) -- (6.33,4.02);
+  \draw[-{Stealth[length=1.6mm]},BrandGray,thick] (lob.east) -- (6.33,4.00);
+  \draw[-{Stealth[length=1.6mm]},BrandGray,thick] (move.east) -- (6.33,3.10);
+  \draw[-{Stealth[length=1.6mm]},BrandGray,thick] (fill.east) -- (6.33,2.20);
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (6.33,3.10) -- (overlay.west);
+  \draw[-{Stealth[length=2mm]},BrandOrange,thick] (overlay.east) -- (9.20,3.50);
+  \draw[-{Stealth[length=1.8mm]},BrandGray,thick] (10.82,2.72) -- (eff.north);
+
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=5.55cm,align=left,inner sep=5pt] (casea) at (3.38,0.88) {
     {\bfseries Case 1: aligned with market move}\\
     market move supports order side\\
     raise FAK confidence with executable liquidity\\
     lower slippage / impact};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=5.55cm,align=left,inner sep=5pt] (caseb) at (9.35,0.70) {
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=5.55cm,align=left,inner sep=5pt] (caseb) at (9.62,0.88) {
     {\bfseries Case 2: against market move}\\
     market move works against order side\\
     revise fill expectation, level and aggression\\
@@ -217,11 +232,11 @@
 \end{column}
 \begin{column}{0.53\textwidth}
 \begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\scriptsize}]
-  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=5.85cm,align=left,inner sep=5pt] (cross) at (3.05,4.10) {\key{Internalization}\hfill avoid spread + external impact};
-  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=5.85cm,align=left,inner sep=5pt] (timing) at (3.05,3.10) {\key{Liquidity timing}\hfill depth + resiliency windows};
-  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=5.85cm,align=left,inner sep=5pt] (tox) at (3.05,2.10) {\key{Toxicity control}\hfill hedge leakage + bad fills};
+  \node[draw=BrandBlue,fill=BrandBlueLight,rounded corners=2pt,text width=5.85cm,align=left,inner sep=5pt] (timing) at (3.05,4.10) {\key{Liquidity timing}\hfill depth + resiliency windows};
+  \node[draw=BrandPurple,fill=BrandPurpleLight,rounded corners=2pt,text width=5.85cm,align=left,inner sep=5pt] (tox) at (3.05,3.10) {\key{Toxicity control}\hfill hedge leakage + bad fills};
+  \node[draw=BrandOrange,fill=BrandOrangeLight,rounded corners=2pt,text width=5.85cm,align=left,inner sep=5pt] (cross) at (3.05,2.10) {\key{Internalization}\hfill avoid spread + external impact};
   \node[draw=BrandGreen,fill=BrandGreenLight,rounded corners=2pt,text width=5.85cm,align=center,inner sep=5pt,font=\scriptsize\bfseries] (proof) at (3.05,0.82) {Attribution ledger: slippage, impact, internalization uplift};
-  \foreach \s in {cross,timing,tox}{\draw[-{Stealth[length=2mm]},BrandGray,thick] (\s.south) -- (proof.north);}
+  \draw[-{Stealth[length=2mm]},BrandGray,thick] (3.05,1.72) -- (proof.north);
   \node[BrandGray,align=center] at (3.05,4.82) {Where the 0.01 bp opportunity comes from};
 \end{tikzpicture}
 \end{column}

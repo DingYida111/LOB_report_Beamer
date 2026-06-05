@@ -10,7 +10,9 @@
 
 这一页直接进入领导最关心的第一个应用场景：PEAK Algo 里的 FAK order execution。
 
-左边是 PEAK Algo 当前已有的订单状态，包括 parent order、当前队列位置、剩余风险和已有执行状态。中间不是替代 PEAK 的新 algo，而是加一层 execution strategy overlay。它吃三类信息：LOB liquidity state、短期 market-move signal，以及 fill / cost model。
+图里的大框代表 PEAK Algo 的 FAK execution engine。左侧是 PEAK 当前已有的订单上下文，包括 parent order、FAK instruction、当前队列状态和剩余风险。中间不是替代 PEAK 的新 algo，而是加一层 execution strategy overlay。
+
+这层 overlay 的新策略组件主要有三类：LOB liquidity state、短期 market-move signal，以及 fill / cost model。它们的作用不是单独输出一个买卖方向，而是把市场微观结构状态翻译成 PEAK 可以执行的控制参数。
 
 这层 overlay 最后影响 PEAK Algo 的三个执行动作：FAK 什么时候点、点在哪一档、多激进；如果没成交，是否 retry；以及成交预期变化时，hedge timing 是否要调整。
 
@@ -50,7 +52,7 @@
 
 我们用 2025 年 flow 约 45 万亿、平均久期 2 年、每笔交易节省 0.01bp 来做量级估算，大约是 9000 万人民币的潜在年度效率空间。这里重点是“可归因、可验证”，不是承诺立即实现。
 
-0.01bp 可以来自三类机制。第一是 internalization，减少外部 spread 和 market impact。第二是 liquidity timing，在 depth 和 resiliency 更好的窗口执行。第三是 toxicity control，降低 hedge leakage 和 bad fills。
+0.01bp 可以来自三类机制，但讲述顺序要突出 microstructure。第一是 liquidity timing，在 depth 和 resiliency 更好的窗口执行。第二是 toxicity control，降低 hedge leakage 和 bad fills。第三才是 internalization，减少外部 spread 和 market impact，这部分作为部门级效率扩展放在最后讲。
 
 落地路径分四步：replay 先确认指标和成本口径；shadow 让模型只给建议，不影响真实交易；pilot 在 FAK order 和局部 internalization 场景里验证；scale 后把 attribution ledger 固化到日常监控。
 

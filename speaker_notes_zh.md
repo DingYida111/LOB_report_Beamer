@@ -14,7 +14,7 @@
 
 左侧橙色区域是外部的 microstructure strategy layer，包含三类新策略组件：LOB liquidity state、短期 market-move signal，以及 fill / cost model。它们的作用不是单独输出一个买卖方向，而是通过 strategy adapter，把市场微观结构状态翻译成 PEAK 可以接收的控制信号。
 
-进入 PEAK 以后，它影响的是 FAK execution logic 和 control interface：FAK 什么时候点、点在哪一档、多激进；如果没成交，是否 retry；以及成交预期变化时，hedge timing 是否要调整。
+进入 PEAK 以后，它不改造平台本身，而是影响两个核心位置：一是已有的 FAK engine，二是 control updates。具体就是 FAK 什么时候点、点在哪一档、多激进；如果没成交，是否 retry；以及成交预期变化时，hedge timing 是否要调整。
 
 右边两个 case 建议这样讲：
 

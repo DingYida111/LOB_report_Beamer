@@ -1,67 +1,69 @@
 # Smart Execution 6 页领导汇报讲稿
 
-## 1. Liquidity-Aware Smart Execution for Desk Efficiency
+## 1. Liquidity-Aware Smart Execution
 
 这一页只做封面，不展开内容。
 
-开场可以一句话带过：今天主要汇报如何用 LOB、microstructure 和 liquidity signals 构建 Smart Execution，提升整个 FICC desk 的执行效率。
+开场一句话：今天主要汇报如何用 LOB、microstructure 和 liquidity signals，形成面向 FMD 和 PEAK Algo 的 smart execution strategy。
 
-## 2. Smart Execution as a Desk Efficiency Layer
+## 2. FAK Order Execution in PEAK Algo
 
-这一页用一张图说明 Smart Execution 在整个 desk 里的位置。
+这一页直接进入领导最关心的第一个应用场景：PEAK Algo 里的 FAK order execution。
 
-现在 desk 主要有两条交易路径。第一条是主观交易员在交易平台上手工交易，第二条是量化交易员通过 Peak Algo 进行量化交易。覆盖的品种是 FICC，策略和频率都很多，从相对低频的组合调整，到更高频的算法执行都有。
+左边是 PEAK Algo 当前已有的订单状态，包括 parent order、当前队列位置、剩余风险和已有执行状态。中间不是替代 PEAK 的新 algo，而是加一层 execution strategy overlay。它吃三类信息：LOB liquidity state、短期 market-move signal，以及 fill / cost model。
 
-Smart Execution 不是替代交易员，也不是替代 Peak Algo，而是在两条路径之上增加一层执行控制。它把三类信息融合起来：第一是 LOB state，比如 spread、depth、imbalance；第二是 flow、inventory、RFQ 和 axes。这里 axes 可以口头解释为 desk 的方向性买卖兴趣，或者库存消化意愿；第三是历史订单和成交信息，比如 fill rate、slippage 和 market impact。
+这层 overlay 最后影响 PEAK Algo 的三个执行动作：FAK 什么时候点、点在哪一档、多激进；如果没成交，是否 retry；以及成交预期变化时，hedge timing 是否要调整。
 
-这层智能最后落到四个效率杠杆：timing、FAK aggression、internal cross 和 residual route。领导需要记住的是，它不是一个单点模型，而是一套执行效率闭环：输入交易路径和市场状态，输出执行动作，再用 slippage、impact、internalization uplift 和 attributed PnL 做反馈。
+右边两个 case 建议这样讲：
 
-## 3. FAK Order Execution Efficiency
+第一个是 order aligned with market move。比如我们要买，而短期市场 move 和 liquidity state 支持这个买单，此时可以提高 FAK 信心，但前提是 liquidity 是 executable 的。这里的 efficiency 体现为更高 fill quality、更低 slippage 和更低 market impact。
 
-这一页讲第一条主线：FAK order execution efficiency。
+第二个是 order against market move。比如我们要买，但短期市场 move 对我们不利，或者 toxicity/cost 升高，这时不应该沿用原来的 fill expectation，而应调整价格档位和 aggression。这样不一定是为了“少交易”，而是为了提高成功率、降低错误 FAK 和 unhedged risk。
 
-流程上，LOB 特征先生成 direction 和 liquidity regime 信号，再和 Algo 当前的实时成交概率结合，包括当前队列位置、剩余量、盘口深度和历史成交行为。这里不要在图上强调 15 到 130 分钟，因为它容易被误解成 raw LOB 对这个 horizon 的直接价格预测。更准确的讲法是：这些信号按执行窗口和流动性状态更新，最终输出不是简单买卖信号，而是 FAK order 的执行决策：什么时候点、点在哪一档、要多激进。
+## 3. Liquidity Turns Prediction into Execution Strategy
 
-这里要讲清楚两个场景。
+这一页承接论文和参考图，讲清楚为什么只做 prediction 不够。
 
-第一个场景是市场方向有利。比如我们要买，LOB 信号显示后续市场方向也偏上，成交概率更高，这时 FAK order 更容易产生 execution efficiency，体现为更低滑点、更低 market impact。
+左上角是 liquidity measurement：spread、depth、imbalance、impact cost、resiliency 和 realized slippage。这些指标不是为了做一个漂亮的 microstructure dashboard，而是为了回答中间的交易问题：能不能进出？市场能吸收多少 size？当前 quote 是否脆弱？order book 恢复得快不快？
 
-第二个场景是市场方向不利。比如我们要买，但 LOB 方向和成交概率都不支持，这时不应该盲目维持原来的 FAK order 预期，而应该修正成交预期和激进程度。这样可以提高交易成功率，同时减少没有及时 hedge 带来的 unhedged risk。
+右上角强调 prediction alone is not enough。一个 tick prediction 模型可能告诉我们方向，但它不直接定价 spread 和 impact，不直接给 fill probability，也不会自动生成 execution policy。
+
+所以真正可落地的链条是下面两块：execution strategy 要补上 cost model、fill model、horizon model、passive/aggressive policy、sizing、retry 和 hedge controls。最后形成 operational chain：LOB state 到 predictive signal，到 liquidity-aware decision，再到 PEAK execution policy，最后看 realized trading outcome。
+
+这页的底线是：可持续的 execution PnL 不是单纯来自预测方向，而是来自 prediction 和 measurable liquidity / execution model 的结合。
 
 ## 4. Liquidity is the True State Variable
 
-这一页讲一个更底层、也更经典的结论：liquidity 才是真正的 state variable。
+这一页讲底层抽象：liquidity 才是真正的 control state。
 
-论文里虽然有很多模型，比如 DeepLOB、HLOB、LOBFrame，但落到执行上，最重要的不是模型名字，而是我们到底在估计什么状态。我的理解是：我们不是单纯预测价格，而是在估计当前市场的 liquidity state。
+我们不把 LOB 模型包装成单纯的价格预测器，而是把它理解成 liquidity state estimator。图上的 \(\mathcal{L}_t\) 包括 cost、capacity、immediacy、resiliency、toxicity 和 internalization。
 
-图上的 \(\mathcal{L}_t\) 可以理解成 liquidity state vector。它不是一个单一指标，而是由 cost、capacity、immediacy、resiliency、toxicity 和 internal fit 这些维度组成。
+这几个维度分别对应执行问题：交易贵不贵、市场能吃多少量、能不能立即成交、冲击后恢复快不快、成交是否有 adverse selection 风险、以及内部化的可能性。
 
-雷达图的好处是更直观：不是每个市场状态都只用“好/坏”判断，而是看 liquidity profile 的形状。比如有的状态是容量很好但 toxicity 高，有的状态是外部 liquidity 贵但 internal fit 很高。
+读图时可以这样讲：capacity 和 resiliency 好时，提高 FAK confidence；cost 或 toxicity 高时，下调 fill expectation 和 aggression；internalization 高时，先考虑内部匹配再外部路由；整体 state 弱时，延迟、切小或提前 hedge。
 
-这就直接决定 execution policy：capacity 和 resiliency 好的时候，可以提高 FAK 的信心；cost 或 toxicity 高的时候，要修正成交预期和激进程度；internal fit 高的时候，应该先考虑 internal crossing；如果整体 state 很弱，就要延迟、切小或者提前 hedge。
+这页的记忆点是：Price is the observation. Liquidity is the control state.
 
-这页的重点是把论文支撑讲成一个可执行的系统框架：market microstructure 的价值，不只是预测涨跌，而是把 spread、depth、resiliency、order flow、internal demand 转成 liquidity state，再转成执行动作。
+## 5. 0.01 bp as Attributed Efficiency Opportunity
 
-文献支撑可以简短带过：Lehalle 和 Laruelle 强调 liquidity 是执行的核心变量；Cont 和 de Larrard 说明 queue depletion 对短期价格形成有机制性影响；Bacry 等人的 Hawkes/order-flow 研究说明订单流强度有 regime dependence；DeepLOB、LOBFrame 和 benchmark 研究说明 LOB 有预测结构，但必须用成本感知指标评估。
+这一页讲产出空间，但措辞上不要说成已经锁定的 target，而是 addressable efficiency opportunity。
 
-## 5. Internal Flow: Fit Before Route
+我们用 2025 年 flow 约 45 万亿、平均久期 2 年、每笔交易节省 0.01bp 来做量级估算，大约是 9000 万人民币的潜在年度效率空间。这里重点是“可归因、可验证”，不是承诺立即实现。
 
-这一页讲第二条主线：microstructure 如何提升 internal flow 利用效率。重点不只是“能不能内部成交”，而是先判断 internal fit，再决定是否外部路由。
+0.01bp 可以来自三类机制。第一是 internalization，减少外部 spread 和 market impact。第二是 liquidity timing，在 depth 和 resiliency 更好的窗口执行。第三是 toxicity control，降低 hedge leakage 和 bad fills。
 
-图上横轴是 external liquidity state，越往右说明外部市场流动性越好、冲击成本越低。纵轴是 internal fit，越往上说明内部订单、库存、RFQ、axes 在方向、期限、规模和紧急程度上越匹配。
+落地路径分四步：replay 先确认指标和成本口径；shadow 让模型只给建议，不影响真实交易；pilot 在 FAK order 和局部 internalization 场景里验证；scale 后把 attribution ledger 固化到日常监控。
 
-四个象限对应四类策略。如果 internal fit 高、外部 liquidity 也好，就先 internal crossing，再对剩余风险做低成本 hedge。如果 internal fit 高但外部 liquidity 差，就优先 warehouse 或等待，避免在 toxic market 里被动付成本。如果 internal fit 低但外部 liquidity 好，可以直接外部路由，因为 residual cost 可控。如果两者都弱，就要切小、等待或寻找新的 internal demand。
+最后要强调，汇报 PnL 时不是讲模型 accuracy，而是讲 slippage、impact、internalization uplift 这些 execution metrics。
 
-这页要强调，microstructure 不是单独做一个模型，而是把外部 liquidity cost 和内部 flow fit 同时放进决策：什么时候内部化，什么时候外部化，外部化时怎么减少成本。
+## 6. Internalization: Match Before Route
 
-评价指标不看模型准确率本身，而看 internalization uplift、residual external cost、slippage 和 post-trade impact。这也是 LOB benchmark 和 LOBFrame 这类研究给我们的重要提醒：预测指标必须转成交易成本指标。
+最后一页讲 internalization。它和 LOB microstructure 有关系，但不如 PEAK execution 那么直接，所以放在最后作为部门级效率扩展。
 
-## 6. 0.01 bp Execution PnL: Attribution Plan
+这页不要再用旧的 fit 表述，改成 internalization match。横轴是 external liquidity state，越往右说明外部路由成本更可控。纵轴是 internalization match，越往上说明客户订单、RFQ、axes、库存、期限、规模、方向和 urgency 更匹配。
 
-最后一页讲 0.01bp 如何变成可归因、可落地的 execution PnL。
+四个象限对应四种策略。如果 internalization match 高、外部 liquidity 也好，就先 internalize，再 hedge residual。如果 match 高但外部 liquidity 差，优先 warehouse 或等待，避免 toxic route。如果 match 低但外部 liquidity 好，外部路由成本可控，可以 route externally。如果两者都弱，就切小、等待或寻找新的 match。
 
-年度效率目标是每笔交易平均节省 0.01bp。按照 2025 年交易量约 45 万亿、平均久期 2 年计算，固定收益近似是 45 万亿乘以 2，再乘以 0.01bp，约等于 9000 万人民币年度 PnL。
+右边的 Matching inputs 讲清楚需要哪些输入：client orders、RFQ、axes、inventory、side、tenor、size、urgency、hedge cost、limits 和 residual risk。
 
-理论上，0.01bp 来自三类机制。第一是 internal crossing，少付外部 spread 和 market impact。第二是 liquidity timing，在订单簿深度好、恢复快、冲击成本低的时候执行。第三是 toxicity control，在市场方向不利或者订单流有毒时减少 hedge leakage 和 bad fills。
-
-实际计划上分四步：先做历史 replay，确认指标定义和成本口径；再做 shadow mode，让模型只给建议不影响真实交易；然后选择 FAK order 和部分 internal flow 做 pilot；最后把 attribution ledger 固化到日常监控。我们不空口说节省，而是用三类指标验证：相对 arrival price 或 decision price 的 slippage，成交后的 market impact 和 hedge delay，以及 internalization uplift 对比 residual external cost。只要这些指标能稳定改善，就能把 0.01bp 的节省做成可归因、可汇报的结果。
+这页的结论是：internalization 不是简单“内部能不能成交”，而是一个 match quality + external route cost 的决策问题；衡量标准是 savings vs. external route cost。

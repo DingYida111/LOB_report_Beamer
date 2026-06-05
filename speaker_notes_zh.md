@@ -10,11 +10,11 @@
 
 这一页直接进入领导最关心的第一个应用场景：PEAK Algo 里的 FAK order execution。
 
-图里的大框代表 PEAK Algo 的 FAK execution engine。左侧是 PEAK 当前已有的订单上下文，包括 parent order、FAK instruction、当前队列状态和剩余风险。中间不是替代 PEAK 的新 algo，而是加一层 execution strategy overlay。
+图里的蓝色大框代表 PEAK Algo instance 的平台边界。这里要强调一点：PEAK Algo 是我们已有的算法交易平台和量化交易实例，不是这次新策略本身。
 
-这层 overlay 的新策略组件主要有三类：LOB liquidity state、短期 market-move signal，以及 fill / cost model。它们的作用不是单独输出一个买卖方向，而是把市场微观结构状态翻译成 PEAK 可以执行的控制参数。
+左侧橙色区域是外部的 microstructure strategy layer，包含三类新策略组件：LOB liquidity state、短期 market-move signal，以及 fill / cost model。它们的作用不是单独输出一个买卖方向，而是通过 strategy adapter，把市场微观结构状态翻译成 PEAK 可以接收的控制信号。
 
-这层 overlay 最后影响 PEAK Algo 的三个执行动作：FAK 什么时候点、点在哪一档、多激进；如果没成交，是否 retry；以及成交预期变化时，hedge timing 是否要调整。
+进入 PEAK 以后，它影响的是 FAK execution logic 和 control interface：FAK 什么时候点、点在哪一档、多激进；如果没成交，是否 retry；以及成交预期变化时，hedge timing 是否要调整。
 
 右边两个 case 建议这样讲：
 
